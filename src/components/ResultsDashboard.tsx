@@ -3,6 +3,7 @@ import { ScoreGauge } from "./ScoreGauge";
 import { CategoryCard } from "./CategoryCard";
 import { IssueList } from "./IssueList";
 import { CompetitorTable } from "./CompetitorTable";
+import { LeadCaptureCard } from "./LeadCaptureCard";
 
 function DataModeBanner({ dataMode }: { dataMode: ScanResult["dataMode"] }) {
   if (dataMode === "live") return null;
@@ -37,6 +38,13 @@ export function ResultsDashboard({
           </p>
         </div>
       </div>
+
+      <LeadCaptureCard
+        scanId={result.scanId}
+        scanInput={result.input}
+        overallScore={result.overallScore}
+        topIssueTitle={result.topIssues[0]?.title}
+      />
 
       <IssueList issues={result.topIssues} onFixClick={onFixClick} />
 

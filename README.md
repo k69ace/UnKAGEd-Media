@@ -35,6 +35,15 @@ Clicking **"Fix it with AI"** on any fixable issue calls `src/lib/agents/fix.ts`
 which generates a concrete before/after remediation — using Claude when
 `ANTHROPIC_API_KEY` is set, or a curated template library otherwise.
 
+Right under the score, `src/components/LeadCaptureCard.tsx` offers to email
+the visitor their full report and a free fix-it call — this is the lead-gen
+funnel: `POST /api/lead` validates the submission and forwards it to
+`LEAD_WEBHOOK_URL` (Zapier/Make.com/GoHighLevel/Slack/anything that accepts a
+JSON webhook) if configured, and always logs it server-side either way. The
+"Book a call" CTA that appears after submission links to
+`NEXT_PUBLIC_BOOKING_URL` (a scheduling link), falling back to a `mailto:`
+using `NEXT_PUBLIC_CONTACT_EMAIL` if no booking link is set.
+
 ## Setup
 
 ```bash
@@ -57,6 +66,10 @@ See `.env.example`. The app is fully functional with **zero** keys set
   required). Falls back to `GOOGLE_PLACES_API_KEY` if that's set.
 - `ANTHROPIC_API_KEY` — enables Claude-generated review sentiment summaries
   and restaurant-specific AI copy in the Fix It flow.
+- `LEAD_WEBHOOK_URL` — forwards captured leads (email/name/phone + scan
+  context) to your CRM/automation of choice as a JSON POST.
+- `NEXT_PUBLIC_BOOKING_URL` / `NEXT_PUBLIC_CONTACT_EMAIL` — power the "Book a
+  call" CTA shown after someone submits the lead form.
 
 ## Security notes
 
@@ -69,8 +82,9 @@ SSRF. This is a hostname-literal check, not full DNS-rebinding protection.
 ## Tech stack
 
 Next.js (App Router) + TypeScript + Tailwind CSS. Route handlers under
-`src/app/api/` expose `POST /api/scan` and `POST /api/fix`; the app is
-otherwise a single-page client experience (`src/components/GraderApp.tsx`).
+`src/app/api/` expose `POST /api/scan`, `POST /api/fix`, and `POST /api/lead`;
+the app is otherwise a single-page client experience
+(`src/components/GraderApp.tsx`).
 
 ## Scripts
 

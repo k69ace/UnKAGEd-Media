@@ -75,3 +75,17 @@ export type FixResult = {
   explanation: string;
   generatedBy: "ai" | "template";
 };
+
+export type LeadRequest = {
+  scanId: string;
+  scanInput: ScanInput;
+  overallScore: number;
+  topIssueTitle?: string;
+  name?: string;
+  email: string;
+  phone?: string;
+};
+
+export type LeadResult = {
+  received: boolean;
+};
