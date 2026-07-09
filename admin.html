@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Submissions — BMW/ISM Culinary Program Planner</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --navy:#122a52; --navy-dark:#0b1c38; --navy-mid:#1c3a6b;
+    --gold:#b8902e; --gold-light:#e9c869; --danger:#b3372c;
+    --bg:#f5f4f0; --card:#ffffff; --surface-alt:#eef1f7; --line:#dfe3ea;
+    --heading:#122a52; --text:#1c2430; --muted:#5b6472;
+    --pill-free-bg:#eaf3df; --pill-free-text:#4c6a1f;
+    --shadow:0 1px 3px rgba(18,42,82,.08), 0 1px 2px rgba(18,42,82,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#11151f; --card:#1a2130; --surface-alt:#212a3b; --line:#313c50; --heading:#e7ecf5; --text:#dde2ea; --muted:#94a1b7; --danger:#e08072; --pill-free-bg:#25331b; --pill-free-text:#a7d17e; --shadow:0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.32); }
+  }
+  :root[data-theme="dark"]{ --bg:#11151f; --card:#1a2130; --surface-alt:#212a3b; --line:#313c50; --heading:#e7ecf5; --text:#dde2ea; --muted:#94a1b7; --danger:#e08072; --pill-free-bg:#25331b; --pill-free-text:#a7d17e; }
+  :root[data-theme="light"]{ --bg:#f5f4f0; --card:#ffffff; --surface-alt:#eef1f7; --line:#dfe3ea; --heading:#122a52; --text:#1c2430; --muted:#5b6472; --danger:#b3372c; --pill-free-bg:#eaf3df; --pill-free-text:#4c6a1f; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.4;font-variant-numeric:tabular-nums;}
+  h1,h2,h3{margin:0 0 .3em;text-wrap:balance;}
+  button{font-family:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 14px;font-size:13px;font-weight:600;}
+  button.primary{background:var(--navy);color:#fff;border-color:var(--navy);}
+  button.small{padding:4px 10px;font-size:12px;}
+  input[type=password], input[type=text]{font-family:inherit;border:1px solid var(--line);border-radius:6px;padding:8px;font-size:13.5px;background:var(--card);color:var(--text);}
+
+  .topbar{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-dark) 100%);color:#fff;padding:18px 24px;}
+  .topbar h1{font-size:20px;}
+  .topbar p{margin:0;font-size:13px;color:#c9d4e8;}
+
+  .gate{position:fixed;inset:0;background:rgba(11,20,38,.85);display:flex;align-items:center;justify-content:center;z-index:60;}
+  .gate-box{background:var(--card);border-radius:12px;padding:26px;max-width:340px;width:100%;box-shadow:var(--shadow);}
+  .gate-box h2{color:var(--heading);font-size:16px;}
+  .gate-box p{font-size:12.5px;color:var(--muted);}
+  .gate-box input{width:100%;margin:10px 0;}
+  .gate-err{color:var(--danger);font-size:12px;min-height:16px;}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:24px;}
+  .toolbar-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .config-warn{background:var(--pill-free-bg);color:var(--pill-free-text);border-radius:8px;padding:12px 16px;font-size:13px;margin-bottom:16px;}
+  .config-warn.err{background:#fbe9d8;color:#9a5a10;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+  th,td{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;}
+  th{background:var(--surface-alt);color:var(--heading);font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;}
+  tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;}
+  tr.sub-row{cursor:pointer;}
+  tr.sub-row:hover{background:var(--surface-alt);}
+  .notes-preview{color:var(--muted);font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  .detail{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;box-shadow:var(--shadow);}
+  .detail h2{color:var(--heading);border-bottom:2px solid var(--gold);padding-bottom:6px;}
+  table.sum-table{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:13px;box-shadow:none;}
+  table.sum-table th,table.sum-table td{border:1px solid var(--line);padding:7px 10px;}
+  .sum-day-block{margin-bottom:18px;}
+  .sum-day-title{background:var(--navy);color:#fff;padding:8px 12px;border-radius:6px 6px 0 0;font-weight:700;font-size:14px;}
+  .sum-day-body{border:1px solid var(--line);border-top:none;border-radius:0 0 6px 6px;padding:12px 16px;}
+  .sum-cat{margin-bottom:8px;}
+  .sum-cat h4{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);margin-bottom:3px;}
+  .sum-item{font-size:13.5px;margin:0 0 2px;}
+  .sum-item .d{color:var(--muted);font-size:12px;}
+  .empty{color:var(--muted);font-size:13px;padding:30px 0;text-align:center;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Walnut Catering — Submissions</h1>
+  <p>BMW/ISM Culinary Program Planner · every menu a client has submitted, newest first</p>
+</div>
+
+<div class="wrap">
+  <div class="toolbar-row">
+    <div id="countLabel" style="font-size:13px;color:var(--muted)"></div>
+    <button class="primary" data-action="refresh">Refresh</button>
+  </div>
+  <div id="configWarn"></div>
+  <div id="listWrap"></div>
+  <div id="detailWrap"></div>
+</div>
+
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <h2>Enter passcode</h2>
+    <p>This page shows every menu a client has submitted, including guest counts and pricing. It's a simple shared passcode, not real login security — don't share this link publicly.</p>
+    <input type="password" id="gateInput" placeholder="Passcode">
+    <div class="gate-err" id="gateErr"></div>
+    <button class="primary" data-action="gate-submit" style="width:100%">Enter</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---- Config — must match index.html's values ---- */
+var SUPABASE_URL = "";
+var SUPABASE_ANON_KEY = "";
+/* Change this before sharing the link. Client-side only — see schema.sql for the real
+   security tradeoff (anyone with the anon key can query the table directly regardless
+   of this passcode; it just blocks casual browsing of this page). */
+var ADMIN_PASSCODE = "walnut2026";
+
+var PRICING = { breakfast: 28.95, lunch: 29.95, reception: 35.95, bar: 45.00 };
+var submissions = [];
+
+function escapeHtml(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function money(n){ n=Number(n)||0; return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function moneyRound(n){ n=Number(n)||0; return "$"+Math.round(n).toLocaleString("en-US"); }
+
+function upchargeTotal(daypart){
+  var sum=0;
+  daypart.categories.forEach(function(cat){
+    cat.items.forEach(function(item){
+      if (item.upcharge && item.upcharge>0){
+        var n=(item.splitCount!=null && item.splitCount!=="")?Number(item.splitCount):daypart.guests;
+        sum += item.upcharge*n;
+      }
+    });
+  });
+  return sum;
+}
+function daypartTotal(daypart, base){ return (daypart.guests*base) + upchargeTotal(daypart); }
+function computeDay(day){
+  var bf=daypartTotal(day.breakfast,PRICING.breakfast);
+  var lu=daypartTotal(day.lunch,PRICING.lunch);
+  var re=daypartTotal(day.reception,PRICING.reception);
+  var bar=day.bar.enabled?(day.bar.guests*PRICING.bar):0;
+  var food=bf+lu+re;
+  return {bf:bf,lu:lu,re:re,bar:bar,food:food,total:food+bar};
+}
+
+function renderSummaryDay(day){
+  var c = computeDay(day);
+  function catsBlock(dp){
+    return dp.categories.map(function(cat){
+      var items = cat.items.map(function(it){
+        var extra=[];
+        if (it.desc) extra.push(it.desc);
+        if (it.upcharge>0) extra.push("+"+money(it.upcharge)+"/guest");
+        if (cat.items.length>1 && it.splitCount!=null && it.splitCount!=="") extra.push(it.splitCount+" guests");
+        return '<div class="sum-item"><strong>'+escapeHtml(it.name)+'</strong>'+(extra.length?' <span class="d">— '+escapeHtml(extra.join(", "))+'</span>':'')+'</div>';
+      }).join("");
+      return '<div class="sum-cat"><h4>'+escapeHtml(cat.name)+'</h4>'+items+'</div>';
+    }).join("");
+  }
+  return '<div class="sum-day-block">'+
+    '<div class="sum-day-title">'+escapeHtml(day.label)+'</div>'+
+    '<div class="sum-day-body">'+
+      '<h4 style="color:var(--heading)">Breakfast — '+day.breakfast.guests+' guests ('+day.breakfast.time+') · '+moneyRound(c.bf)+'</h4>'+
+      catsBlock(day.breakfast)+
+      '<h4 style="color:var(--heading);margin-top:14px">Lunch — '+day.lunch.guests+' guests ('+day.lunch.time+') · '+moneyRound(c.lu)+'</h4>'+
+      catsBlock(day.lunch)+
+      '<h4 style="color:var(--heading);margin-top:14px">Evening Reception — '+day.reception.guests+' guests ('+day.reception.time+') · '+moneyRound(c.re)+'</h4>'+
+      catsBlock(day.reception)+
+      (day.bar.enabled ? '<h4 style="color:var(--heading);margin-top:14px">Hosted Bar — '+day.bar.guests+' guests · '+moneyRound(c.bar)+'</h4>' : '')+
+    '</div>'+
+  '</div>';
+}
+
+function fmtDate(iso){
+  try{ return new Date(iso).toLocaleString("en-US", {dateStyle:"medium", timeStyle:"short"}); }catch(e){ return iso; }
+}
+
+function renderList(){
+  var el = document.getElementById("listWrap");
+  document.getElementById("countLabel").textContent = submissions.length + " submission" + (submissions.length===1?"":"s");
+  if (!submissions.length){
+    el.innerHTML = '<div class="empty">No submissions yet. Once a client uses the planner and hits "Submit to Walnut Catering," it will show up here.</div>';
+    return;
+  }
+  el.innerHTML = '<table><thead><tr><th>Submitted</th><th>Client</th><th>Notes</th><th class="num">Program Total</th><th class="num">Guest-Days</th></tr></thead><tbody>'+
+    submissions.map(function(s){
+      return '<tr class="sub-row" data-id="'+s.id+'">'+
+        '<td>'+escapeHtml(fmtDate(s.created_at))+'</td>'+
+        '<td>'+escapeHtml(s.client_name||"—")+'</td>'+
+        '<td class="notes-preview">'+escapeHtml(s.notes||"")+'</td>'+
+        '<td class="num">'+moneyRound(s.program_total)+'</td>'+
+        '<td class="num">'+(s.guest_days||0).toLocaleString()+'</td>'+
+      '</tr>';
+    }).join("")+
+    '</tbody></table>';
+}
+
+function renderDetail(id){
+  var s = submissions.filter(function(x){ return String(x.id)===String(id); })[0];
+  var el = document.getElementById("detailWrap");
+  if (!s){ el.innerHTML=""; return; }
+  var state = s.state;
+  var dayBlocks = state.days.map(renderSummaryDay).join("");
+  el.innerHTML = '<div class="detail">'+
+    '<h2>Submission #'+s.id+' — '+escapeHtml(s.client_name||"—")+'</h2>'+
+    '<p style="color:var(--muted);font-size:13px">Submitted '+escapeHtml(fmtDate(s.created_at))+
+      ' · Program Total '+moneyRound(s.program_total)+' ('+moneyRound(s.program_food_total)+' food + '+moneyRound(s.program_bar_total)+' bar), '+(s.guest_days||0).toLocaleString()+' guest-days</p>'+
+    (s.notes ? '<p><strong>Notes:</strong> '+escapeHtml(s.notes)+'</p>' : '')+
+    dayBlocks+
+  '</div>';
+  el.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function loadSubmissions(){
+  var listEl = document.getElementById("listWrap");
+  var warnEl = document.getElementById("configWarn");
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY){
+    warnEl.innerHTML = '<div class="config-warn err">This admin page isn\'t connected to the database yet — set SUPABASE_URL and SUPABASE_ANON_KEY at the top of admin.html (same values as in index.html) once the Supabase project is created.</div>';
+    listEl.innerHTML = '';
+    document.getElementById("countLabel").textContent = "";
+    return;
+  }
+  warnEl.innerHTML = "";
+  listEl.innerHTML = '<div class="empty">Loading…</div>';
+  fetch(SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/submissions?select=*&order=created_at.desc", {
+    headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": "Bearer " + SUPABASE_ANON_KEY }
+  }).then(function(res){
+    if (!res.ok) return res.text().then(function(t){ throw new Error("HTTP "+res.status+": "+t); });
+    return res.json();
+  }).then(function(rows){
+    submissions = rows || [];
+    renderList();
+    var params = new URLSearchParams(window.location.search);
+    var wantId = params.get("id");
+    if (wantId) renderDetail(wantId);
+  }).catch(function(err){
+    warnEl.innerHTML = '<div class="config-warn err">Couldn\'t load submissions: '+escapeHtml(err.message)+'</div>';
+    listEl.innerHTML = '';
+  });
+}
+
+document.addEventListener("click", function(e){
+  var row = e.target.closest("tr.sub-row");
+  if (row){ renderDetail(row.dataset.id); return; }
+  var t = e.target.closest("[data-action]");
+  if (!t) return;
+  if (t.dataset.action==="refresh") loadSubmissions();
+  if (t.dataset.action==="gate-submit") checkGate();
+});
+document.getElementById("gateInput").addEventListener("keydown", function(e){ if (e.key==="Enter") checkGate(); });
+
+function checkGate(){
+  var val = document.getElementById("gateInput").value;
+  if (val === ADMIN_PASSCODE){
+    document.getElementById("gate").classList.add("hidden");
+    loadSubmissions();
+  } else {
+    document.getElementById("gateErr").textContent = "Incorrect passcode.";
+  }
+}
+
+document.getElementById("gateInput").focus();
+})();
+</script>
+</body>
+</html>

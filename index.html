@@ -266,6 +266,26 @@
   .hidden{display:none !important;}
   footer.appfoot{text-align:center;font-size:11px;color:var(--muted);padding:20px;}
 
+  /* ---------- Submit modal ---------- */
+  .overlay{
+    position:fixed;inset:0;z-index:50;background:rgba(11,20,38,.55);
+    display:flex;align-items:center;justify-content:center;padding:16px;
+  }
+  .modal{
+    background:var(--card);border-radius:12px;box-shadow:var(--popover-shadow);
+    width:100%;max-width:440px;padding:22px;
+  }
+  .modal h3{color:var(--heading);font-size:17px;}
+  .modal-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;}
+  .modal-field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:12px;}
+  .modal-field input, .modal-field textarea{font-family:inherit;font-size:13.5px;font-weight:400;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--card);resize:vertical;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px;}
+  .submit-status{font-size:12.5px;border-radius:6px;padding:8px 10px;margin-bottom:10px;}
+  .submit-status.ok{background:var(--pill-free-bg);color:var(--pill-free-text);}
+  .submit-status.warn{background:var(--pill-premium-bg);color:var(--pill-premium-text);}
+  .submit-status.err{background:var(--pill-premium-bg);color:var(--danger);}
+  .submit-status a{color:inherit;text-decoration:underline;}
+
   @media print{
     :root{
       --bg:#fff; --card:#fff; --surface-alt:#eef1f7; --line:#c9cfdb;
@@ -302,6 +322,7 @@
   <div class="toolbar-actions">
     <button class="btn ghost" data-action="reset">Reset to Original Proposal</button>
     <button class="btn primary" data-action="print">Print / Save PDF</button>
+    <button class="btn gold" data-action="submit-open">Submit to Walnut Catering</button>
   </div>
 </div>
 
@@ -316,6 +337,24 @@
 
 <footer class="appfoot">Built for Walnut Catering &amp; Events · Adjustments here are for planning purposes — final pricing is confirmed in the signed catering agreement.</footer>
 
+<div id="submitOverlay" class="overlay hidden">
+  <div class="modal">
+    <h3>Submit This Menu to Walnut Catering</h3>
+    <p class="modal-sub">This saves your current selections and opens an email draft to your Walnut Catering contacts. You can submit more than once — every submission is kept, so send it again any time you make changes.</p>
+    <label class="modal-field">Your name / company
+      <input type="text" id="submitName" value="ISM | Executive Hosting Advisory">
+    </label>
+    <label class="modal-field">Notes for Walnut (optional)
+      <textarea id="submitNotes" rows="3" placeholder="Anything you want them to know about these changes…"></textarea>
+    </label>
+    <div id="submitStatus" class="submit-status hidden"></div>
+    <div class="modal-actions">
+      <button class="btn" data-action="submit-cancel">Cancel</button>
+      <button class="btn gold" data-action="submit-send" id="submitSendBtn">Send</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
 "use strict";
@@ -324,6 +363,19 @@
    CONSTANTS
 ========================================================= */
 var STORAGE_KEY = "walnut_bmw_ism_planner_v2";
+
+/* ---- Submission backend (fill in once the Supabase project exists) ----
+   SUPABASE_URL:      Project Settings > API > Project URL (e.g. https://xxxxx.supabase.co)
+   SUPABASE_ANON_KEY: Project Settings > API > "anon" "public" key (NOT the service_role key)
+   ADMIN_URL:         where admin.html ends up hosted, used to build a deep link in the
+                       notification email so Kirk/Eric can jump straight to a submission.
+   Until SUPABASE_URL is set, Submit still works — it just skips the database save and
+   goes straight to the email draft / clipboard fallback so nothing is lost in the meantime. */
+var SUPABASE_URL = "";
+var SUPABASE_ANON_KEY = "";
+var ADMIN_URL = "";
+var SUBMIT_RECIPIENTS = ["kirk@unkagedmedia.com", "eric@eatwalnut.com"];
+
 var PRICING = { breakfast: 28.95, lunch: 29.95, reception: 35.95, bar: 45.00 };
 var DAYPART_LABEL = { breakfast:"Breakfast", lunch:"Lunch", reception:"Evening Reception" };
 var DAYPART_TIME_DEFAULT = { breakfast:"7:00–11:00 a.m.", lunch:"12:00–3:00 p.m.", reception:"4:00–7:00 p.m." };
@@ -632,6 +684,133 @@ function computeProgram(){
     totals.perDay[day.id] = c;
   });
   return totals;
+}
+
+/* =========================================================
+   SUBMIT TO WALNUT
+========================================================= */
+function buildSubmissionSummaryText(clientName, notes, submissionId){
+  var t = computeProgram();
+  var lines = [];
+  lines.push("BMW Executive Hospitality & Culinary Program — Adjusted Menu Submission");
+  lines.push("Submitted by: " + (clientName || "(no name given)") + " on " + new Date().toLocaleString("en-US"));
+  lines.push("");
+  state.days.forEach(function(day){
+    var c = t.perDay[day.id];
+    lines.push(day.label.split(",")[0] + " — Breakfast " + day.breakfast.guests + " · Lunch " + day.lunch.guests +
+      " · Reception " + day.reception.guests + (day.bar.enabled ? (" · Bar " + day.bar.guests) : " · Bar off") +
+      " — Day Total " + moneyRound(c.total));
+  });
+  lines.push("");
+  lines.push("PROGRAM TOTAL: " + moneyRound(t.total) + "  (" + moneyRound(t.food) + " food + " + moneyRound(t.bar) + " bar, " + t.guestDays.toLocaleString() + " guest-days)");
+  lines.push("");
+  lines.push("Notes from client:");
+  lines.push(notes && notes.trim() ? notes.trim() : "(none)");
+  if (submissionId){
+    lines.push("");
+    lines.push("Reference ID: #" + submissionId);
+    if (ADMIN_URL){
+      lines.push("Full day-by-day menu: " + ADMIN_URL + (ADMIN_URL.indexOf("?")>-1?"&":"?") + "id=" + submissionId);
+    } else {
+      lines.push("(Full itemized menu was saved with this submission — look it up by reference ID in the submissions admin page.)");
+    }
+  } else {
+    lines.push("");
+    lines.push("Note: this submission could not be saved to the shared database — see details below. The full menu is still saved in the client's own browser.");
+  }
+  return lines.join("\n");
+}
+function openEmailDraft(clientName, notes, submissionId){
+  var subject = "Menu Submission — " + (clientName || "ISM | Executive Hosting Advisory") + " (" + new Date().toLocaleDateString("en-US") + ")";
+  var body = buildSubmissionSummaryText(clientName, notes, submissionId);
+  var mailto = "mailto:" + SUBMIT_RECIPIENTS.join(",") + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  window.location.href = mailto;
+}
+function submitOpen(){
+  document.getElementById("submitStatus").className = "submit-status hidden";
+  document.getElementById("submitStatus").innerHTML = "";
+  document.getElementById("submitOverlay").classList.remove("hidden");
+}
+function submitCancel(){
+  document.getElementById("submitOverlay").classList.add("hidden");
+}
+function setSubmitStatus(kind, html){
+  var el = document.getElementById("submitStatus");
+  el.className = "submit-status " + kind;
+  el.innerHTML = html;
+}
+function submitSend(){
+  var name = document.getElementById("submitName").value.trim();
+  var notes = document.getElementById("submitNotes").value;
+  var btn = document.getElementById("submitSendBtn");
+  var t = computeProgram();
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+  setSubmitStatus("warn", "Saving your submission…");
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY){
+    setSubmitStatus("err",
+      "This planner isn't connected to a database yet, so this submission won't be saved centrally. " +
+      "Your changes are still safe in this browser. " +
+      '<button class="btn small" data-action="submit-fallback-email" style="margin-top:6px">Open Email Draft Anyway</button> ' +
+      '<button class="btn small" data-action="submit-fallback-copy" style="margin-top:6px">Copy Summary</button>');
+    btn.disabled = false; btn.textContent = "Send";
+    return;
+  }
+
+  var payload = {
+    client_name: name,
+    notes: notes,
+    program_total: Number(t.total.toFixed(2)),
+    program_food_total: Number(t.food.toFixed(2)),
+    program_bar_total: Number(t.bar.toFixed(2)),
+    guest_days: t.guestDays,
+    state: state
+  };
+
+  fetch(SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/submissions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+      "Prefer": "return=representation"
+    },
+    body: JSON.stringify(payload)
+  }).then(function(res){
+    if (!res.ok) return res.text().then(function(txt){ throw new Error("HTTP " + res.status + ": " + txt); });
+    return res.json();
+  }).then(function(rows){
+    var id = rows && rows[0] && rows[0].id;
+    openEmailDraft(name, notes, id);
+    setSubmitStatus("ok", "Saved" + (id ? (" as reference #" + id) : "") + ". An email draft to " + SUBMIT_RECIPIENTS.join(" & ") + " should have opened — just hit send.");
+    btn.disabled = false; btn.textContent = "Send Another";
+  }).catch(function(err){
+    setSubmitStatus("err",
+      "Couldn't reach the database (" + escapeHtml(err.message) + "). This can happen if the page is sandboxed (e.g. a preview) or the database isn't reachable right now. Your changes are still safe in this browser. " +
+      '<button class="btn small" data-action="submit-fallback-email" style="margin-top:6px">Open Email Draft Anyway</button> ' +
+      '<button class="btn small" data-action="submit-fallback-copy" style="margin-top:6px">Copy Summary</button>');
+    btn.disabled = false; btn.textContent = "Send";
+  });
+}
+function submitFallbackEmail(){
+  var name = document.getElementById("submitName").value.trim();
+  var notes = document.getElementById("submitNotes").value;
+  openEmailDraft(name, notes, null);
+}
+function submitFallbackCopy(){
+  var name = document.getElementById("submitName").value.trim();
+  var notes = document.getElementById("submitNotes").value;
+  var text = buildSubmissionSummaryText(name, notes, null);
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      setSubmitStatus("ok", "Summary copied to your clipboard — paste it into an email or message.");
+    }).catch(function(){
+      window.prompt("Copy this summary:", text);
+    });
+  } else {
+    window.prompt("Copy this summary:", text);
+  }
 }
 
 /* =========================================================
@@ -1079,6 +1258,11 @@ document.addEventListener("click", function(e){
   else if (action==="switch-day"){ switchDay(t.dataset.day); }
   else if (action==="reset"){ resetState(); }
   else if (action==="print"){ window.print(); }
+  else if (action==="submit-open"){ submitOpen(); }
+  else if (action==="submit-cancel"){ submitCancel(); }
+  else if (action==="submit-send"){ submitSend(); }
+  else if (action==="submit-fallback-email"){ submitFallbackEmail(); }
+  else if (action==="submit-fallback-copy"){ submitFallbackCopy(); }
   else if (action==="day-apply-all"){ applyDayToAll(t.dataset.day); }
   else if (action==="item-remove"){ removeItem(t.dataset.item); }
   else if (action==="cat-remove"){ removeCategory(t.dataset.cat); }
@@ -1153,6 +1337,13 @@ document.addEventListener("click", function(e){
 
 window.addEventListener("beforeprint", function(){ lastTabBeforePrint = activeTab; switchTab("summary"); });
 window.addEventListener("afterprint", function(){ switchTab(lastTabBeforePrint); });
+
+document.getElementById("submitOverlay").addEventListener("click", function(e){
+  if (e.target.id === "submitOverlay") submitCancel();
+});
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape" && !document.getElementById("submitOverlay").classList.contains("hidden")) submitCancel();
+});
 
 /* =========================================================
    INIT
