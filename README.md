@@ -28,7 +28,7 @@ via the Make.com MCP connector was attempted but blocked this session (needs
 re-authorization — see `make/README.md`); GHL custom-field and workflow
 creation has no public API and is a manual (documented) step regardless.
 
-**First live pilot ran 2026-07-10** against 6 real Orlando restaurants (see
+**First live pilot ran 2026-07-10** against 9 real Orlando restaurants (see
 [`docs/pilots/2026-07-10-orlando-restaurants.md`](docs/pilots/2026-07-10-orlando-restaurants.md)):
 sourced and researched by live web search (no Clay), drafted by hand against
 the system prompt's voice rules, and pushed into GHL as real contacts —
