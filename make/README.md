@@ -80,6 +80,16 @@ native GoHighLevel "Update/Create a Contact" and "Create an Opportunity"
 actions is a reasonable follow-up once Make access is restored — same logic,
 cleaner UI.
 
+## Send gate
+
+Module 2 always tags a new contact `outreach:review`, never `outreach:queued`
+-- this scenario does not decide on its own that a lead is ready to email.
+`outreach:queued` (the tag that actually starts the GHL send workflow, see
+`docs/ghl-setup.md` §4) only gets applied by a human retagging a contact in
+GHL after reviewing the drafts. If/when there's enough track record to trust
+auto-queueing high-score leads, that's a deliberate one-line change to this
+module's `tags` mapper -- don't make it silently.
+
 ## What this scenario deliberately does not do
 
 Multi-day waits (3/4/5 business days between sequence emails) are handled

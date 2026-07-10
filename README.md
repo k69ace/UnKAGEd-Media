@@ -27,3 +27,13 @@ Docs and the Make blueprint are complete and importable. Live provisioning
 via the Make.com MCP connector was attempted but blocked this session (needs
 re-authorization — see `make/README.md`); GHL custom-field and workflow
 creation has no public API and is a manual (documented) step regardless.
+
+**First live pilot ran 2026-07-10** against 6 real Orlando restaurants (see
+[`docs/pilots/2026-07-10-orlando-restaurants.md`](docs/pilots/2026-07-10-orlando-restaurants.md)):
+sourced and researched by live web search (no Clay), drafted by hand against
+the system prompt's voice rules, and pushed into GHL as real contacts —
+tagged `outreach:review`, so nothing sends until Kirk reviews and retags.
+Ties in with [PR #1](https://github.com/k69ace/UnKAGEd-Media/pull/1)
+(Restaurant Grader): once that's deployed, its `/api/scan` endpoint should
+replace hand-research as the enrichment source for this vertical — see
+"Known gaps" in `docs/architecture.md`.

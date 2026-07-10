@@ -70,6 +70,28 @@ intentional, not a placeholder someone forgot to fill in.
 | `outreach:*` tags | Make (initial), GHL workflows (subsequent) | GHL workflow triggers |
 | Opportunity stage | Make (initial: New Lead), GHL workflow (on reply: Qualified), human (Proposal Sent onward) | GHL pipeline view |
 
+## Vertical-specific research: restaurants
+
+The Clay pipeline in `docs/clay-setup.md` is the general-purpose path, but
+for the restaurant vertical specifically there's a sharper option: PR #1
+(Restaurant Grader) already builds a 6-agent diagnostic (website health,
+local SEO, photos, reviews, Google Business Profile, competitors) that
+produces exactly the kind of specific, verifiable finding that makes cold
+outreach land ("your GBP is missing hours," "no online ordering CTA") rather
+than generic B2B personalization. Once that app is deployed, its `/api/scan`
+endpoint should replace Clay's generic enrichment for restaurant prospects:
+source candidates via Google Places (the app already wraps this), run each
+through the scan orchestrator, feed the JSON result to Claude in place of the
+Clay research bundle. It also already POSTs its own "email me my report"
+inbound leads to a configurable `LEAD_WEBHOOK_URL` — pointing that at a GHL
+inbound-webhook workflow trigger gives inbound and outbound restaurant leads
+a shared entry point with no new infrastructure.
+
+Until it's deployed, `docs/pilots/` records runs done by direct web research
+instead — see `docs/pilots/2026-07-10-orlando-restaurants.md` for the first
+one and its limitations (no verified technical audit data, since this
+session's fetch tooling couldn't reach live sites).
+
 ## Known gaps / follow-ups
 
 - **Make.com MCP access**: blocked this session (see `make/README.md`). Once

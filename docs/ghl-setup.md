@@ -46,13 +46,27 @@ GHL upsert-contact module to match.
 Tags auto-create on first use, so you don't need to pre-create them, but for
 clarity the sequence uses:
 
-- `source:clay` -- applied on ingest
+- `source:clay` / `source:pilot-live-research` / etc. -- records how the lead
+  was sourced, applied on ingest
+- `vertical:restaurant` (or other verticals as they're added) -- lets Kirk
+  filter GHL's contact list by which ICP a lead belongs to
+- `outreach:review` -- **the only tag that gates sending.** Every lead lands
+  here first, whether it's a low `lead_score` row or the very first batch in
+  a new vertical. Nothing sends while a contact carries this tag -- the
+  workflow in §4 triggers on `outreach:queued`, not this one. A human removes
+  `outreach:review` and adds `outreach:queued` when a lead (or a batch) is
+  approved to actually go out.
 - `outreach:queued` -- triggers the sequence workflow (§4)
 - `outreach:step1-sent`, `outreach:step2-sent`, `outreach:step3-sent`
 - `outreach:replied` -- stops the sequence
 - `outreach:sequence-complete` -- finished all 3 steps, no reply
 - `outreach:disqualified` -- manual tag for "not a fit," suppresses future sends
-- `outreach:needs-review` -- low lead_score rows Make routes here instead of queuing
+
+Until the send process has a track record, default every new batch to
+`outreach:review` regardless of score -- don't let Make (or any future
+automation) auto-tag straight to `outreach:queued` without an explicit
+decision to turn that on. See `docs/pilots/2026-07-10-orlando-restaurants.md`
+for the first batch run this way.
 
 ## 3. Pipeline mapping
 
