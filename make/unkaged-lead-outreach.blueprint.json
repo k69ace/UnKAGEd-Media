@@ -1,0 +1,135 @@
+{
+  "name": "unKAGEd — Lead Outreach Intake",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "hook": null,
+        "maxResults": 1
+      },
+      "mapper": {},
+      "metadata": {
+        "designer": { "x": 0, "y": 0 },
+        "restore": {
+          "parameters": {
+            "hook": { "label": "unKAGEd Lead Outreach Intake (create new webhook on import)" }
+          }
+        },
+        "parameters": [
+          { "name": "hook", "type": "hook:gateway-webhook", "label": "Webhook", "required": true }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "module": "http:ActionSendData",
+      "version": 3,
+      "parameters": {
+        "handleErrors": false,
+        "useNewZLibDeCompress": true
+      },
+      "mapper": {
+        "url": "https://services.leadconnectorhq.com/contacts/upsert",
+        "serializeUrl": false,
+        "method": "post",
+        "headers": [
+          { "name": "Authorization", "value": "Bearer REPLACE_WITH_GHL_PRIVATE_INTEGRATION_TOKEN" },
+          { "name": "Version", "value": "2021-07-28" },
+          { "name": "Content-Type", "value": "application/json" }
+        ],
+        "qs": [],
+        "bodyType": "raw",
+        "parseResponse": true,
+        "authUser": "",
+        "authPass": "",
+        "timeout": "",
+        "shareCookies": false,
+        "ca": "",
+        "rejectUnauthorized": true,
+        "followRedirect": true,
+        "useQuerystring": false,
+        "gzip": true,
+        "useMtls": false,
+        "contentType": "application/json",
+        "data": "{\n  \"locationId\": \"sBaaCPRBew9XTxCNEY9t\",\n  \"firstName\": \"{{1.first_name}}\",\n  \"lastName\": \"{{1.last_name}}\",\n  \"email\": \"{{1.email}}\",\n  \"companyName\": \"{{1.company_name}}\",\n  \"website\": \"{{1.company_domain}}\",\n  \"source\": \"clay-outbound\",\n  \"tags\": [\"source:clay\", \"{{if(1.lead_score >= 60; \\\"outreach:queued\\\"; \\\"outreach:needs-review\\\")}}\"],\n  \"customFields\": [\n    {\"key\": \"contact.lead_source_channel\", \"field_value\": \"Clay\"},\n    {\"key\": \"contact.company_website_outbound\", \"field_value\": \"{{1.company_domain}}\"},\n    {\"key\": \"contact.linkedin_url\", \"field_value\": \"{{1.linkedin_url}}\"},\n    {\"key\": \"contact.lead_research_summary\", \"field_value\": \"{{1.research_summary}}\"},\n    {\"key\": \"contact.personalization_angle\", \"field_value\": \"{{1.personalization_angle}}\"},\n    {\"key\": \"contact.pain_point_hypothesis\", \"field_value\": \"{{1.pain_point_hypothesis}}\"},\n    {\"key\": \"contact.lead_score\", \"field_value\": \"{{1.lead_score}}\"},\n    {\"key\": \"contact.outreach_step1_subject\", \"field_value\": \"{{1.step1_subject}}\"},\n    {\"key\": \"contact.outreach_step1_body\", \"field_value\": \"{{1.step1_body}}\"},\n    {\"key\": \"contact.outreach_step2_subject\", \"field_value\": \"{{1.step2_subject}}\"},\n    {\"key\": \"contact.outreach_step2_body\", \"field_value\": \"{{1.step2_body}}\"},\n    {\"key\": \"contact.outreach_step3_subject\", \"field_value\": \"{{1.step3_subject}}\"},\n    {\"key\": \"contact.outreach_step3_body\", \"field_value\": \"{{1.step3_body}}\"},\n    {\"key\": \"contact.linkedin_connection_note\", \"field_value\": \"{{1.linkedin_note}}\"}\n  ]\n}"
+      },
+      "metadata": {
+        "designer": { "x": 300, "y": 0 },
+        "restore": {},
+        "parameters": [
+          { "name": "handleErrors", "type": "boolean", "label": "Evaluate all states as errors" },
+          { "name": "useNewZLibDeCompress", "type": "hidden" }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "module": "http:ActionSendData",
+      "version": 3,
+      "filter": {
+        "name": "Qualified lead only (score >= 60)",
+        "conditions": [
+          [
+            { "a": "{{1.lead_score}}", "o": "number:greaterequal", "b": "60" }
+          ]
+        ]
+      },
+      "parameters": {
+        "handleErrors": false,
+        "useNewZLibDeCompress": true
+      },
+      "mapper": {
+        "url": "https://services.leadconnectorhq.com/opportunities/",
+        "serializeUrl": false,
+        "method": "post",
+        "headers": [
+          { "name": "Authorization", "value": "Bearer REPLACE_WITH_GHL_PRIVATE_INTEGRATION_TOKEN" },
+          { "name": "Version", "value": "2021-07-28" },
+          { "name": "Content-Type", "value": "application/json" }
+        ],
+        "qs": [],
+        "bodyType": "raw",
+        "parseResponse": true,
+        "authUser": "",
+        "authPass": "",
+        "timeout": "",
+        "shareCookies": false,
+        "ca": "",
+        "rejectUnauthorized": true,
+        "followRedirect": true,
+        "useQuerystring": false,
+        "gzip": true,
+        "useMtls": false,
+        "contentType": "application/json",
+        "data": "{\n  \"pipelineId\": \"eG2OVYUlRXmmN9ULneCj\",\n  \"locationId\": \"sBaaCPRBew9XTxCNEY9t\",\n  \"name\": \"{{1.company_name}} \\u2014 Outbound\",\n  \"pipelineStageId\": \"813e8c4e-dc17-4711-aed9-ee70a553ffe1\",\n  \"status\": \"open\",\n  \"contactId\": \"{{2.data.contact.id}}\"\n}"
+      },
+      "metadata": {
+        "designer": { "x": 600, "y": 0 },
+        "restore": {},
+        "parameters": [
+          { "name": "handleErrors", "type": "boolean", "label": "Evaluate all states as errors" },
+          { "name": "useNewZLibDeCompress", "type": "hidden" }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "instant": true,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": { "orphans": [] },
+    "zone": "us1.make.com"
+  }
+}
