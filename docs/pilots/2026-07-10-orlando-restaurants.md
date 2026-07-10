@@ -29,64 +29,104 @@ Grader's scan (or equivalent) against each site first.
 ## Selection
 
 Target market: Orlando, FL (independent restaurants, not chains or
-large hospitality-group properties). Two sourcing passes the same day, 9
+large hospitality-group properties). Three sourcing passes the same day, 28
 candidates total across Mills 50, Ivanhoe Village, Downtown, Baldwin Park,
-and the Milk District; all confirmed as real, independently or
+Milk District, Winter Park, Winter Garden, Dr. Phillips, SoDo, Colonialtown,
+Hourglass District, and Oviedo; all confirmed as real, independently or
 small-group-owned businesses with a publicly listed contact email (business
-inquiry addresses — catering/party/info desks, not scraped personal emails).
+inquiry addresses — catering/party/info/owner desks, not scraped personal
+emails).
 
 ## Results
 
 | Restaurant | Score | Angle | GHL contact ID | Email used |
 |---|---|---|---|---|
+| Kaya | 72 | Michelin Green Star + James Beard press wave | `JyizQ57H2M4LEj8BEg4K` | info@kayaorlando.com |
 | White Wolf Cafe | 78 | New ownership at a 30+ yr institution | `ZMXosVWz2074CV15LzfU` | info@whitewolfcafe.com |
 | Swine & Sons | 70 | Expanding Orlando → Las Vegas | `695FP3XaXeFE7FnwocYO` | info@swineandsons.com |
+| Chayote Barrio Kitchen | 68 | Celebrity chef's mainland US debut | `vr7ppgTvTsEMDOcNSnE7` | reservations@chayotebarriokitchen.com |
+| Relax Grill | 66 | Lakefront Lake Eola foot traffic, unconverted | `cCnmcQpmryKUJbSYnqFj` | relaxgrill@gmail.com |
 | TaKo Cheena | 65 | Solo chef-owner running 2 concepts | `fZaVLyYmghKw95r0Utzl` | takocheena@gmail.com |
-| Se7en Bites | 63 | Chef-owner running 2 restaurants + catering | `hN3OBoxxYBf9gJFZoEcM` | trina@se7enbites.com |
+| Crocante Restaurant | 64 | Press-anointed signature dish, unlevered | `uRMFqu4wWDsaB4XhtdYP` | support@crocantekitchen.com |
+| Chatham's Place | 63 | Chef's own garden as an unused content story | `yDhPtXUGAfdAtNM4CylC` | info@chathamsplace.com |
 | La Bella Luna | 62 | 3-year "Best Pizza" streak, unlevered | `wyoTMR6KYLNz42n0jvtD` | labellalunaflorida@gmail.com |
+| Papa Llama | 62 | Michelin-recognized but press calls it "lowkey" | `mGjttSrfsjiw4t5H47Re` | hola@papallamaorl.com |
+| Kadence | 61 | Reservation-only; off-peak seating gap | `3wSTqIUkIhsVJgP0OYCe` | info@kadenceorlando.com |
 | Santiago's Bodega | 60 | Packed brunch, no weekday-conversion system | `aRwHhSpAzvOyVw5DnTo8` | party@santiagosbodega.com |
+| TALAY | 60 | Newer concept in a crowded downtown strip | `OMVNiW18zsQ6KD8ALrnm` | talaythaiorlando@gmail.com |
+| Beezer Eats | 59 | Food-truck-origin brand voice, unsystematized | `Acg6wV2V8ypPgU2FfuYf` | forrest@beezereats.com |
 | Reyes Mezcaleria | 58 | One of several concepts under a small group | `JLgVaH9URCm1lRgssltR` | info@reyesmex.com |
+| Infusion Tea | 58 | Niche vegetarian audience, no direct list yet | `A0438h4DqYTa3jdPqBDF` | brad@infusiontea.us |
+| Se7en Bites | 58 | Bakery + catering, two unconnected audiences | `hN3OBoxxYBf9gJFZoEcM` | trina@se7enbites.com |
+| Delaney's Tavern | 57 | Owned by 2 full-time physicians, no bandwidth | `aOdYMGeFi1fG5POkUdk4` | info@eatdt.com |
+| JJ's Fresh from Scratch | 56 | Has a marketing inbox, no system behind it | `HaoQxNFADmTiJPjt4lwA` | jjsmarketing@jjsfresh.com |
 | Pig Floyd's Urban Barbakoa | 55 | Consolidating out of a second location | `ufS7g0jQBnhQHKS1dPTF` | catering@pigfloyds.com |
+| Bosphorous Turkish Cuisine | 55 | 20+ yr legacy brand running on word of mouth | `lZ2OdkCFfbF7u1ktS4Oc` | info@bosphorousrestaurant.com |
+| The Attic Door | 54 | 3 venues in 1 (wine/music/tea), unconnected audiences | `Ensi7ItIVbg4fTniYwbb` | wintergardenattic@gmail.com |
+| Claddagh Cottage Irish Pub | 53 | Recently relocated, awareness reset needed | `vxOYHLMTzKmtbNV7oOMF` | vicki@claddaghcottagepub.com |
+| TORI TORI | 52 | 1 of 7 concepts under one chef-owner group | `kA88m2NaNXSdDB4McmoE` | toritoripub@gmail.com |
+| Black Bean Deli | 51 | Legacy institution vs. newer marketed competitors | `jT7KavsZIwIvHiG5zpHB` | catering@blackbeandeli.com |
 | Zaru | 50 | Fresh Michelin Bib Gourmand press wave | `7L6xevqA0t01WWFn16Ej` | info@zarufl.com |
+| Bulla Gastrobar (Winter Park) | 50 | 1 location inside a multi-city group | `Jbv1vBomGB0mNHFA0Rq1` | info@bullagastrobar.com |
+| Omega Deli | 48 | Lunch-dependent, dead evenings/weekends | `1hVSqseaXTmL7lQ8iylT` | constantino@omegadelirestaurant.com |
 
-Full research summaries, pain-point hypotheses, and all 27 drafted emails
+Full research summaries, pain-point hypotheses, and all 84 drafted emails
 (3 per restaurant) were shared as a review artifact in the same conversation
 this file was committed from — ask Kirk for the link if it's not already at
 hand, or regenerate from the contact records below once custom fields exist.
 
-### Considered and excluded (batch 2 sourcing pass)
+**Correction (same day, before this file's second commit):** the original
+Se7en Bites draft referenced her second concept SETTE in Ivanhoe Village.
+SETTE has since closed (confirmed via Yelp) — the angle and all 3 drafts for
+Se7en Bites were rewritten around the bakery/catering split instead. Score
+dropped 63 → 58 to reflect the weaker angle. Flagged in the artifact with a
+visible "corrected" marker on that ticket.
 
-Logged so a future pass doesn't re-spend time on these: **Junior's Diner**
-and **The Rusty Spoon** — confirmed closed per Yelp. **Colibri Mexican
-Cuisine** — confirmed closed per Yelp. **Papi's Burritos, Otto's High Dive,
-DOMU, Infusion Tea, Kappo Tsan** — real, open businesses, but no publicly
-verifiable contact email surfaced after 1-2 targeted searches each (some
-have contact forms only, some only social DM); not pushed rather than guess
-an address. Kappo Tsan is also under the same ownership (Jimmy/Johnny Tung)
-as Zaru, already in this batch, and had only just opened — low priority
-either way.
+### Considered and excluded (all three sourcing passes)
+
+Logged so a future pass doesn't re-spend time on these.
+
+**Confirmed closed (Yelp or press):** Junior's Diner, The Rusty Spoon, Colibri
+Mexican Cuisine, Soco Thornton Park, Le Ky Patisserie, Leguminati, La Femme
+du Fromage, Steak on Fire, SETTE.
+
+**Real and open, but no publicly verifiable contact email found** (only a
+phone number, a contact form, or a Cloudflare-obfuscated address this
+session's tools can't decode): Papi's Burritos, Otto's High Dive, DOMU,
+Kappo Tsan (also same ownership as Zaru, already in this batch), Cecil's
+Texas Style BBQ, Johnny's Fillin' Station, Rockpit Brewing, The Strand,
+Umi Japanese, Black Rooster Taqueria, Theo's Kitchen, Uncommon Catering,
+Sixty South, Foxtail Coffee, Chuan Lu Garden, BoVine Steakhouse, Boca,
+Prato (owned by a hospitality group, not independent, regardless), Mia's
+Italian Kitchen (part of Alex Restaurant Partners group, not independent),
+Canvas Restaurant & Market (Tavistock Restaurant Collection, not
+independent), Nona Blue, Tabla Indian Restaurant (franchise brand),
+Antonio's (recently sold to a hospitality group), Chef's Table at the
+Edgewater (recently sold, no email found), Positano, Yao's, Stefano's,
+Market to Table, Mangoni, Cedar's, Flame Kabob, Pammie's Sammies (original
+Dr. Phillips location also closed), The Wine Room, Kabooki Sushi.
 
 ## What's actually live right now
 
-- All 9 exist as real GHL contacts (ids above), in the `unKAGEd Media Agency`
-  location, tagged `source:pilot-live-research`, `outreach:review`,
+- All 28 exist as real GHL contacts (ids above), in the `unKAGEd Media
+  Agency` location, tagged `source:pilot-live-research`, `outreach:review`,
   `vertical:restaurant`.
 - **Custom field data did not attach.** The upsert call for White Wolf Cafe
   was sent with the full `customFields` payload (research summary, angle,
   all 3 drafts) and GHL's API returned `"customFields": []` — the 14 fields
   documented in `docs/ghl-setup.md` §1 don't exist in this account yet, so
-  GHL silently drops unknown keys rather than creating them. The remaining 8
+  GHL silently drops unknown keys rather than creating them. The remaining 27
   contacts were pushed with core fields only (no point sending data that gets
   dropped). Once the fields exist, re-running the same upsert calls
   (idempotent on email) will backfill this content onto these same records.
 - **No opportunities were created.** The GHL MCP connector available this
   session exposes `opportunities_get/search/update` but no create action.
-  Either create these 9 manually in the Digital Marketing Pipeline's "New
+  Either create these 28 manually in the Digital Marketing Pipeline's "New
   Lead" stage, or wait until the Make.com connector is reauthorized and use
   the blueprint in `make/`.
 - **Nothing will send.** `outreach:review` is not the trigger tag for the
   cold-sequence workflow (`docs/ghl-setup.md` §4 triggers on
-  `outreach:queued`) — these 9 sit inert until a human retags them.
+  `outreach:queued`) — these 28 sit inert until a human retags them.
 
 ## Follow-ups this pilot surfaced
 
@@ -97,8 +137,14 @@ either way.
    swap this hand-research method for calling its real `/api/scan` endpoint
    — would add verified technical findings (page speed, GBP completeness,
    structured data) on top of the ownership/news signals used here.
-3. Two of nine contacts (Santiago's Bodega, Pig Floyd's) only have a
-   department inbox (party/catering) rather than a general or ownership
-   email — flagged in both the artifact and the table above as
-   lower-confidence sends. Worth a manual pass to find a better address
-   before these two actually queue.
+3. Several contacts (Santiago's Bodega, Pig Floyd's, Black Bean Deli) only
+   have a department inbox (party/catering) rather than a general or
+   ownership email — flagged in the artifact as lower-confidence sends.
+   Worth a manual pass to find better addresses before these queue.
+4. Requested batch size was 30; landed at 28. Roughly 60 additional
+   candidates were checked across this and prior passes — about half had no
+   publicly discoverable general contact email. Diminishing returns set in
+   hard by the end (multiple 5-search rounds yielding 0-1 verified emails);
+   closing the last 2 would mean either guessing an email (against this
+   project's own rule) or a genuinely fresh sourcing angle (e.g. a paid
+   email-finder API) rather than more manual web search.
