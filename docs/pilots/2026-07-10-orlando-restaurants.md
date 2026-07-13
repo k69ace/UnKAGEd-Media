@@ -128,6 +128,43 @@ Dr. Phillips location also closed), The Wine Room, Kabooki Sushi.
   cold-sequence workflow (`docs/ghl-setup.md` §4 triggers on
   `outreach:queued`) — these 28 sit inert until a human retags them.
 
+## Custom field backfill attempted 2026-07-13 — blocked by a connector bug
+
+Kirk created the 14 custom fields per `docs/ghl-setup.md` §1 (confirmed live via
+`locations_get-custom-fields` — all 14 exist with the exact keys these drafts
+reference). Attempted to re-run the upsert on White Wolf Cafe
+(`ZMXosVWz2074CV15LzfU`) to backfill the research/drafts now that the fields
+exist.
+
+**Every write attempt reports success but the data never lands.** Tried, in
+order: `contacts_upsert-contact` with key-based custom fields
+(`{"key": "contact.lead_score", "field_value": "78"}`) — 201, `customFields: []`
+on read-back. `contacts_update-contact` with the same payload — 200, still
+empty. ID-based reference instead of key
+(`{"id": "XEiKknfwCIqjEh7lQsdl", "field_value": "78"}`) — 200, still empty.
+`value` instead of `field_value` as the payload key — 200, still empty.
+Confirmed via a direct `contacts_get-contact` read after each attempt, not
+just trusting the upsert response. All four are documented, valid GHL API v2
+shapes — this isn't a payload-format mistake, it's the MCP connector's
+`contacts_upsert-contact`/`contacts_update-contact` tools silently failing to
+forward `customFields` writes to GHL's actual API.
+
+Did not repeat this against the other 27 contacts — the failure is
+consistent and not something retrying fixes. Two real paths forward:
+
+1. **Retry in a future session** in case this is a transient connector issue
+   that gets fixed upstream (Anthropic/GHL connector update) — worth a
+   one-contact test before committing to a full 28-contact re-run.
+2. **Use the Make.com scenario instead** (`make/`) once that connector is
+   reauthorized. It writes to GHL via direct HTTP calls with a Private
+   Integration Token (`docs/architecture.md`), bypassing this specific MCP
+   tool entirely — this was already the documented approach for scale, this
+   just confirms it's now the *only* proven path for custom-field data, not
+   just the preferred one.
+
+Core fields (name, email, company, website, tags, source) are unaffected —
+those write and read back correctly on all 28 contacts, confirmed above.
+
 ## Follow-ups this pilot surfaced
 
 1. Add `outreach:review` as a formally documented holding tag in
