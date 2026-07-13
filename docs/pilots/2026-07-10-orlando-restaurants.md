@@ -180,6 +180,58 @@ merge-field driven and the custom fields still won't populate, queuing any
 contact right now would send a blank email. Do not tag anything
 `outreach:queued` until this is resolved.
 
+## Make.com backfill attempt 2026-07-13 — also blocked, different reason
+
+With the Make.com connector reauthorized and a live GHL Private Integration
+Token provided, built a scenario (`unKAGEd — Backfill Custom Fields`, scenario
+id `5653608`, team `464546`, zone `us2.make.com`) to write all 12 custom
+fields to the 27 contacts still missing them (White Wolf Cafe was already
+backfilled by hand via the GHL UI as a manual test — see below). The scenario
+itself is correctly built (webhook trigger → HTTP PUT to
+`services.leadconnectorhq.com/contacts/{id}` with the bearer token) and would
+work fine against a **real webhook call**.
+
+**The blocker: `scenarios_run` (Make's on-demand/API execution) does not
+cascade past a `gateway:CustomWebHook` trigger module.** Confirmed with a
+throwaway data-store probe module inserted right after the trigger — every
+on-demand run (27 individual calls, an Iterator-based bulk variant, an
+Interface-based variant with `on-demand` scheduling, `responsive: true`) came
+back `status: 1` "success" from Make's API, but the probe never received a
+single record, `transfer: 0` on every execution, and GHL's own contact
+records were provably untouched (`customFields: []`, `dateUpdated` unchanged
+from 2026-07-10) across every contact spot-checked. Make's on-demand API
+only ever triggers module 1 in test/preview terms — it does not feed
+synthetic data through an instant/webhook trigger into the rest of the flow.
+That requires a genuine HTTP POST to the real webhook URL
+(`https://hook.us2.make.com/hr43u6vsp8u3c83kg49w26tojz4rtsss`), and this
+session's outbound network policy denies both that host and
+`services.leadconnectorhq.com` directly (confirmed 403 policy denial, not a
+transient error — not something to route around from here).
+
+**Resolution: skipped Make entirely, used GHL's native CSV import instead.**
+Pulled all 27 remaining contacts' emails via `contacts_get-contact` and
+generated `ghl_custom_fields_backfill_27.csv` (delivered to Kirk directly,
+not committed to this repo — contains full drafted outreach copy) with
+columns for all 12 custom fields keyed on email. GHL's contact import
+supports updating existing contacts by email match and mapping CSV columns
+straight to custom fields — this is the same mechanism that already worked
+for White Wolf Cafe's manual paste, just batched. **Import still needs to be
+run by Kirk** (Contacts → Import, map columns to the 12 custom fields
+documented in `docs/ghl-setup.md` §1, choose "update existing contact by
+email"); this session cannot drive the GHL UI directly.
+
+**Flag: White Wolf Cafe (`ZMXosVWz2074CV15LzfU`) already carries the
+`outreach:queued` tag** from the earlier manual-paste test — its real
+3-step cold sequence may already be running or have completed. Worth
+checking its conversation history/tags before doing anything else with that
+contact.
+
+The Make scenario (`5653608`) and its blueprint doc
+(`make/unkaged-backfill-custom-fields.blueprint.json`) are left in place for
+reference, but are not the working path — a future session should either use
+Make's actual webhook (real HTTP POST from Kirk's own machine or a
+non-sandboxed environment) or continue using the CSV import approach.
+
 ## Follow-ups this pilot surfaced
 
 1. Add `outreach:review` as a formally documented holding tag in

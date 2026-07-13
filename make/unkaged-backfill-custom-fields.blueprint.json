@@ -40,7 +40,7 @@
       "module": "http:ActionSendData",
       "version": 3,
       "parameters": {
-        "handleErrors": false,
+        "handleErrors": true,
         "useNewZLibDeCompress": true
       },
       "mapper": {
