@@ -165,6 +165,21 @@ consistent and not something retrying fixes. Two real paths forward:
 Core fields (name, email, company, website, tags, source) are unaffected —
 those write and read back correctly on all 28 contacts, confirmed above.
 
+**Re-confirmed 2026-07-13, several hours later:** same test contact, same
+`contact.lead_score` field, `contacts_update-contact` with a fresh call —
+200 success, `customFields: []` on read-back again. Not transient. Not
+retrying further from this session; this needs either a connector fix or
+the Make.com HTTP path.
+
+**GHL-side build for the send pipeline is otherwise complete as of
+2026-07-13**: both workflows ("Outbound: Cold Sequence" and "Outbound:
+Reply Detected") and all 3 email templates are built per `docs/ghl-setup.md`
+§4-6. The pipeline is fully wired and will fire correctly the moment a
+contact is tagged `outreach:queued` — but since the templates are 100%
+merge-field driven and the custom fields still won't populate, queuing any
+contact right now would send a blank email. Do not tag anything
+`outreach:queued` until this is resolved.
+
 ## Follow-ups this pilot surfaced
 
 1. Add `outreach:review` as a formally documented holding tag in
