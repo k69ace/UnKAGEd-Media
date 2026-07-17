@@ -1,0 +1,98 @@
+{
+  "name": "unKAGEd — Backfill Custom Fields (28 restaurant leads)",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "hook": null,
+        "maxResults": 1
+      },
+      "mapper": {},
+      "metadata": {
+        "designer": { "x": 0, "y": 0 },
+        "restore": {
+          "parameters": {
+            "hook": { "label": "Backfill trigger — one-shot, fired manually by Claude with the full 28-lead payload" }
+          }
+        },
+        "parameters": [
+          { "name": "hook", "type": "hook:gateway-webhook", "label": "Webhook", "required": true }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "module": "builtin:BasicFeeder",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "array": "{{1.leads}}"
+      },
+      "metadata": {
+        "designer": { "x": 300, "y": 0 },
+        "restore": {}
+      }
+    },
+    {
+      "id": 3,
+      "module": "http:ActionSendData",
+      "version": 3,
+      "parameters": {
+        "handleErrors": true,
+        "useNewZLibDeCompress": true
+      },
+      "mapper": {
+        "url": "https://services.leadconnectorhq.com/contacts/{{2.contactId}}",
+        "serializeUrl": false,
+        "method": "put",
+        "headers": [
+          { "name": "Authorization", "value": "Bearer REPLACE_WITH_GHL_PRIVATE_INTEGRATION_TOKEN" },
+          { "name": "Version", "value": "2021-07-28" },
+          { "name": "Content-Type", "value": "application/json" }
+        ],
+        "qs": [],
+        "bodyType": "raw",
+        "parseResponse": true,
+        "authUser": "",
+        "authPass": "",
+        "timeout": "",
+        "shareCookies": false,
+        "ca": "",
+        "rejectUnauthorized": true,
+        "followRedirect": true,
+        "useQuerystring": false,
+        "gzip": true,
+        "useMtls": false,
+        "contentType": "application/json",
+        "data": "{\n  \"customFields\": [\n    {\"key\": \"contact.lead_source_channel\", \"field_value\": \"{{2.lead_source_channel}}\"},\n    {\"key\": \"contact.company_website_outbound\", \"field_value\": \"{{2.company_website_outbound}}\"},\n    {\"key\": \"contact.lead_research_summary\", \"field_value\": \"{{2.lead_research_summary}}\"},\n    {\"key\": \"contact.personalization_angle\", \"field_value\": \"{{2.personalization_angle}}\"},\n    {\"key\": \"contact.pain_point_hypothesis\", \"field_value\": \"{{2.pain_point_hypothesis}}\"},\n    {\"key\": \"contact.lead_score\", \"field_value\": \"{{2.lead_score}}\"},\n    {\"key\": \"contact.outreach_step1_subject\", \"field_value\": \"{{2.step1_subject}}\"},\n    {\"key\": \"contact.outreach_step1_body\", \"field_value\": \"{{2.step1_body}}\"},\n    {\"key\": \"contact.outreach_step2_subject\", \"field_value\": \"{{2.step2_subject}}\"},\n    {\"key\": \"contact.outreach_step2_body\", \"field_value\": \"{{2.step2_body}}\"},\n    {\"key\": \"contact.outreach_step3_subject\", \"field_value\": \"{{2.step3_subject}}\"},\n    {\"key\": \"contact.outreach_step3_body\", \"field_value\": \"{{2.step3_body}}\"}\n  ]\n}"
+      },
+      "metadata": {
+        "designer": { "x": 600, "y": 0 },
+        "restore": {},
+        "parameters": [
+          { "name": "handleErrors", "type": "boolean", "label": "Evaluate all states as errors" },
+          { "name": "useNewZLibDeCompress", "type": "hidden" }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "instant": true,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": { "orphans": [] },
+    "zone": "us2.make.com"
+  }
+}
