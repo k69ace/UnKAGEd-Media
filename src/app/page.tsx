@@ -2,8 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Container } from "@/components/Container";
 import { CtaSection } from "@/components/CtaSection";
+import { AppCard } from "@/components/AppCard";
 import { apps } from "@/lib/apps";
 import { site } from "@/lib/site";
+
+const featuredApps = apps.filter((app) => app.category === "hospitality").slice(0, 3);
 
 export const metadata: Metadata = {
   title: `${site.name} | AI Business Systems for Restaurants & Hospitality`,
@@ -116,33 +119,8 @@ export default function HomePage() {
           </div>
 
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {apps.map((app) => (
-              <Link
-                key={app.slug}
-                href={`/apps/${app.slug}`}
-                className="group flex flex-col justify-between rounded-2xl border border-border bg-background-elevated p-6 transition-colors hover:border-accent"
-              >
-                <div>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
-                      app.status === "live"
-                        ? "bg-accent-soft text-accent-strong"
-                        : "bg-white/5 text-muted-strong"
-                    }`}
-                  >
-                    {app.status === "live" ? "Live" : "Prototype, in daily use"}
-                  </span>
-                  <h3 className="mt-4 text-lg font-semibold text-foreground">
-                    {app.name}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {app.tagline}
-                  </p>
-                </div>
-                <span className="mt-6 text-sm font-semibold text-accent-strong group-hover:text-accent">
-                  Read more &rarr;
-                </span>
-              </Link>
+            {featuredApps.map((app) => (
+              <AppCard key={app.slug} app={app} />
             ))}
           </div>
         </Container>

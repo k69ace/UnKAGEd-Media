@@ -2,7 +2,16 @@ import { site } from "@/lib/site";
 
 export type AppStatus = "live" | "prototype";
 export type AppCategory = "hospitality" | "range";
-export type AppMockupVariant = "estimator" | "beo" | "labor" | "generic";
+export type AppMockupVariant =
+  | "estimator"
+  | "beo"
+  | "labor"
+  | "roi"
+  | "voice"
+  | "gbp"
+  | "roofing"
+  | "hvac"
+  | "generic";
 
 export interface AppFaq {
   question: string;
@@ -40,10 +49,10 @@ export interface AppDefinition {
   relatedCaseStudySlugs?: string[];
 }
 
-// Only apps with a fully built page belong here. Phase 2 adds the remaining
-// apps (AI Receptionist, Google Business Profile Analyzer, Roof Replacement
-// Calculator, HVAC Prospecting Tool, Marketing ROI Calculator) once their
-// pages are built — no placeholder entries.
+// Only apps with a fully built page belong here — no placeholder entries.
+// Hospitality apps lead; home-services apps ("range") exist to show range,
+// not top-level positioning. See apps/page.tsx and page.tsx (home) for how
+// category is used to keep hospitality first.
 export const apps: AppDefinition[] = [
   {
     slug: "catering-estimator",
@@ -261,6 +270,328 @@ export const apps: AppDefinition[] = [
       href: site.bookingUrl,
     },
     mockup: "labor",
+  },
+  {
+    slug: "marketing-roi-calculator",
+    name: "Marketing ROI Calculator",
+    tagline: "See which marketing channels actually pay for themselves, by channel, not by gut feel.",
+    status: "prototype",
+    statusNote: "Built to answer a specific question in a live operation: which marketing spend is actually working.",
+    category: "hospitality",
+    summary:
+      "The Marketing ROI Calculator ties marketing spend by channel to attributed covers and revenue, so budget decisions are based on channel performance instead of habit.",
+    problem: {
+      heading: "Marketing budgets get renewed by habit, not by performance",
+      body: [
+        "Most restaurants spend money across several marketing channels at once — social ads, a Google Business Profile, third-party delivery promotion, maybe a local paper or radio spot out of habit. Few operators can say with confidence which of those channels is actually bringing in covers versus which one just feels like it's working because it's visible.",
+        "Without a clear line from spend to result, budget tends to get renewed the way it was set last year, not reallocated toward what's producing. That's money that could be moved to a channel that's actually converting.",
+      ],
+    },
+    whatItDoes: [
+      "The Marketing ROI Calculator takes spend by channel and the covers or revenue you can attribute to each one, and returns a ranked ROI comparison across channels.",
+      "It's built to use whatever attribution you already have — promo codes, booking source, a landing page, or a simple \"how did you hear about us\" tally — not a full marketing analytics platform.",
+      "The output is a plain comparison: which channels are paying for themselves, and by how much.",
+    ],
+    outcomes: [
+      {
+        label: "One comparable number per channel",
+        detail: "Spend and attributed return are converted into the same ROI figure across every channel, so they're actually comparable to each other.",
+      },
+      {
+        label: "A concrete budget conversation",
+        detail: "Turns \"I think the ads are working\" into a specific number you can act on when deciding where next month's marketing dollars go.",
+      },
+      {
+        label: "No new tracking stack required",
+        detail: "Works with the attribution data most independent operators already have, instead of requiring a full marketing analytics platform to get started.",
+      },
+    ],
+    howItWorks: [
+      "Inputs: spend per channel, and attributed covers or revenue per channel from whatever source you're already tracking (promo codes, booking source, staff-logged referral).",
+      "Each channel's ROI is calculated as attributed return against spend for that channel.",
+      "Channels are ranked side by side so underperforming and overperforming spend is visible at a glance.",
+      "Runs as a standalone tool — no ad platform or CRM integration required to get a first read.",
+    ],
+    faqs: [
+      {
+        question: "What if I don't have clean attribution data?",
+        answer: "Start with whatever you have — even a rough \"how did you hear about us\" tally at the register gets you a directionally useful first read. The calculator is built to work with imperfect data, not to require a full attribution stack.",
+      },
+      {
+        question: "Does this replace Google Ads or Meta's own reporting?",
+        answer: "No. Those tools report what happened inside their own platform. This calculator is for comparing across platforms and channels on one consistent basis, including channels that don't have their own dashboard.",
+      },
+      {
+        question: "Can I use this for one-time promotions, not just ongoing channels?",
+        answer: "Yes — a single promotion or event sponsorship can be run through the same spend-versus-attributed-return calculation as an ongoing channel.",
+      },
+      {
+        question: "Who should be using this?",
+        answer: "Owner-operators and marketing managers who control a marketing budget directly and want to see what's earning its spot in it.",
+      },
+    ],
+    cta: {
+      label: "Request a demo",
+      href: site.bookingUrl,
+    },
+    mockup: "roi",
+  },
+  {
+    slug: "ai-receptionist",
+    name: "AI Receptionist / Voice AI",
+    tagline: "Answers the calls that would otherwise go to voicemail during the rush.",
+    status: "prototype",
+    statusNote: "Built and tested against real call volume inside a working restaurant operation.",
+    category: "hospitality",
+    summary:
+      "The AI Receptionist answers restaurant phone calls when staff can't get to them, handling reservations and basic questions and logging a summary of every call.",
+    problem: {
+      heading: "A restaurant that doesn't answer the phone is losing business it never sees",
+      body: [
+        "Restaurants run on the phone as much as the door: reservations, to-go orders, basic questions about hours or a private event. During a rush, the phone is the first thing that gets ignored — there's no one to step off the line to answer it, and a caller who hits voicemail usually doesn't call back. They call the next place.",
+        "That's revenue that never shows up as a complaint or a bad review — it just quietly doesn't happen, and it's hardest to see precisely because it's missing calls, not bad ones.",
+      ],
+    },
+    whatItDoes: [
+      "The AI Receptionist answers incoming calls when your team can't, handling reservations, hours, and common questions using scripts built around how your operation actually runs.",
+      "Anything it can't confidently handle gets escalated or routed to a human instead of guessed at.",
+      "Every call gets logged with a summary, so nothing depends on someone remembering to write it down mid-rush.",
+    ],
+    outcomes: [
+      {
+        label: "Calls get answered instead of voicemailed",
+        detail: "Calls that would otherwise hit voicemail during a rush get picked up and handled, instead of going to a caller who won't call back.",
+      },
+      {
+        label: "Front-of-house stays on the floor",
+        detail: "Staff aren't pulled off service to answer routine calls during the busiest part of the shift.",
+      },
+      {
+        label: "A record of every call",
+        detail: "Call summaries are logged automatically, instead of relying on whoever answered to relay the details correctly.",
+      },
+    ],
+    howItWorks: [
+      "Connects to your existing restaurant phone line — callers don't dial a different number.",
+      "Handles calls using scripts configured around your hours, reservation process, and commonly asked questions.",
+      "Escalates unclear requests, complaints, or anything outside its script to a human, rather than improvising.",
+      "Logs a transcript and summary of every call for the team to review.",
+    ],
+    faqs: [
+      {
+        question: "Does this replace my host or hostess?",
+        answer: "No. It's built to catch the calls your team can't get to, particularly during a rush — not to replace the judgment and hospitality a host brings to a call it can handle.",
+      },
+      {
+        question: "What happens on a call it can't handle?",
+        answer: "It escalates: routes to a human if someone's available, or takes a message and flags it for a callback rather than guessing at an answer.",
+      },
+      {
+        question: "Do I need a new phone number?",
+        answer: "No, it connects to your existing line. Callers dial the number they already have.",
+      },
+      {
+        question: "Can it take reservations directly?",
+        answer: "Yes, for straightforward reservation requests within your configured availability. More complex requests — large parties, private events — get routed to a human.",
+      },
+    ],
+    cta: {
+      label: "Request a demo",
+      href: site.bookingUrl,
+    },
+    mockup: "voice",
+  },
+  {
+    slug: "google-business-profile-analyzer",
+    name: "Google Business Profile Analyzer",
+    tagline: "A prioritized punch list for the Google listing most restaurants never audit.",
+    status: "prototype",
+    category: "hospitality",
+    summary:
+      "The Google Business Profile Analyzer audits a restaurant's GBP listing against the factors that affect local search visibility and conversion, and returns a prioritized list of fixes.",
+    problem: {
+      heading: "The Google listing is one of the biggest drivers of walk-ins, and almost nobody audits it",
+      body: [
+        "For most restaurants, a Google Business Profile is the first thing a nearby customer sees — before the website, before social. Stale hours, thin categories, missing photos, and unanswered reviews all quietly hurt local visibility and conversion, but auditing all of that by hand is tedious enough that most operators never do it beyond the initial setup.",
+        "\"We should work on our Google listing\" is a common intention that rarely turns into a specific to-do list, because nobody's translated it into what's actually wrong with the listing.",
+      ],
+    },
+    whatItDoes: [
+      "The Google Business Profile Analyzer checks a listing against the factors that actually affect local search visibility and conversion — completeness, categories, photo freshness, review response rate, and posting activity.",
+      "It returns a prioritized list of specific fixes, ranked by what's likely to move the needle first.",
+      "It's built to turn a vague intention into a concrete punch list, not to replace ongoing profile management.",
+    ],
+    outcomes: [
+      {
+        label: "A specific punch list, not a vague intention",
+        detail: "\"We should work on our Google listing\" becomes a ranked list of exactly what's incomplete or out of date.",
+      },
+      {
+        label: "Surfaces what's easy to fix and easy to ignore",
+        detail: "Stale hours, missing attributes, and unanswered reviews are the kind of gaps that sit unnoticed for months without a prompt to go check.",
+      },
+      {
+        label: "One place to see the whole picture",
+        detail: "Replaces manually checking categories, photos, hours, and reviews separately with a single scored view.",
+      },
+    ],
+    howItWorks: [
+      "Pulls the public data for a given Google Business Profile listing.",
+      "Checks it against known local-search visibility and conversion factors: profile completeness, category accuracy, photo recency, review response rate, and posting activity.",
+      "Scores the listing and generates a prioritized list of recommended fixes.",
+      "Runs as a one-time or periodic audit — it doesn't require handing over your Google account credentials to generate a report.",
+    ],
+    faqs: [
+      {
+        question: "Does this fix my profile automatically?",
+        answer: "No, it audits and prioritizes. The fixes — updating hours, adding photos, responding to reviews — are still applied by you or your team directly in your Google Business Profile.",
+      },
+      {
+        question: "Do I need to give it access to my Google account?",
+        answer: "No. It works from your listing's public data, so there's no account access required to generate a report.",
+      },
+      {
+        question: "How often should I run it?",
+        answer: "Quarterly is a reasonable cadence for most independent operators, or after any significant change — new hours, a menu change, a location update.",
+      },
+      {
+        question: "Does it work for a multi-location operation?",
+        answer: "Yes, each location's listing is analyzed and scored separately, since visibility factors and review patterns typically differ by location.",
+      },
+    ],
+    cta: {
+      label: "Request a demo",
+      href: site.bookingUrl,
+    },
+    mockup: "gbp",
+  },
+  {
+    slug: "roof-replacement-calculator",
+    name: "Roof Replacement Calculator",
+    tagline: "An instant ballpark estimate that captures a roofing lead before they leave the site.",
+    status: "prototype",
+    category: "range",
+    summary:
+      "The Roof Replacement Calculator gives homeowners an instant ballpark estimate range for a roof replacement based on size, pitch, and material — built to capture a lead before they navigate away.",
+    problem: {
+      heading: "A homeowner who can't get a ballpark number leaves the site without becoming a lead",
+      body: [
+        "Roof replacement is a high-consideration purchase — homeowners want some sense of cost before they'll commit to scheduling an in-home estimate. If the only option on a roofing company's site is \"contact us for a quote,\" a lot of that traffic leaves without converting, because the friction of booking an appointment for a completely unknown number is too high.",
+        "This is the same underlying problem as a catering estimate: someone needs a credible number fast, before they're willing to take the next step.",
+      ],
+    },
+    whatItDoes: [
+      "The Roof Replacement Calculator takes roof size, pitch, and material choice and returns an instant ballpark estimate range.",
+      "It's designed to sit on a roofing company's website as a lead-capture step, not as a final quote.",
+      "The homeowner gets a credible number in minutes; the roofing company gets a warmer lead for the in-home estimate.",
+    ],
+    outcomes: [
+      {
+        label: "Captures the lead before they leave",
+        detail: "Gives site visitors a reason to stay and provide contact information instead of bouncing at a \"call for pricing\" wall.",
+      },
+      {
+        label: "A warmer handoff to the sales estimate",
+        detail: "Leads arrive at the in-home estimate already knowing a ballpark range, which shortens the conversation.",
+      },
+      {
+        label: "Built on the same logic as a real estimate",
+        detail: "Material and labor cost ranges are calculated from actual inputs, not a flat average that ignores roof size or material.",
+      },
+    ],
+    howItWorks: [
+      "Inputs: approximate square footage (manual entry or address-based estimate), roof pitch, and material selection.",
+      "Material and labor cost ranges are calculated against those inputs to produce a ballpark estimate range.",
+      "The estimate is presented alongside a lead-capture step for scheduling the in-home inspection.",
+      "Embeds directly on an existing company website.",
+    ],
+    faqs: [
+      {
+        question: "Is this a binding quote?",
+        answer: "No — it's a ballpark range meant to qualify interest and capture a lead. A binding quote still requires an in-home inspection.",
+      },
+      {
+        question: "How accurate is the square footage estimate?",
+        answer: "Reasonably accurate for a ballpark, especially with manual entry from an existing measurement. It's precise enough to set expectations, not precise enough to skip the in-home inspection.",
+      },
+      {
+        question: "Does this replace the in-home inspection?",
+        answer: "No. It's the step before it — getting a homeowner comfortable enough with a rough number to book the inspection that produces the real quote.",
+      },
+      {
+        question: "Can this be embedded on our existing website?",
+        answer: "Yes, that's the intended use — a lead-capture tool embedded on a roofing company's site rather than a standalone destination.",
+      },
+    ],
+    cta: {
+      label: "Request a demo",
+      href: site.bookingUrl,
+    },
+    mockup: "roofing",
+  },
+  {
+    slug: "hvac-prospecting-tool",
+    name: "HVAC Prospecting Tool",
+    tagline: "Prioritizes which homes are actually worth an HVAC company's outbound effort.",
+    status: "prototype",
+    category: "range",
+    summary:
+      "The HVAC Prospecting Tool scores and ranks prospects using signals that correlate with likely HVAC replacement need, so outbound effort goes to the leads worth calling first.",
+    problem: {
+      heading: "Outbound effort is wasted when every prospect gets treated the same",
+      body: [
+        "HVAC companies generating their own leads — through ads, door-knocking, or outbound calling — usually work a list with no real prioritization: every address gets the same effort, regardless of how likely that home actually is to need a system replacement soon. That flattens the return on the time spent prospecting.",
+        "Signals like system age, home age, and service history are usually available somewhere, but rarely pulled together into something a sales or outbound team can actually use to decide who to call first.",
+      ],
+    },
+    whatItDoes: [
+      "The HVAC Prospecting Tool scores prospects against signals that correlate with likely replacement need — home age, known system age, and service history where available.",
+      "It returns a ranked list, so outbound calling or door-knocking effort goes to the highest-likelihood prospects first.",
+      "It's built to sit in front of whatever outbound process a company already runs, not to replace it.",
+    ],
+    outcomes: [
+      {
+        label: "Outbound effort goes to the best prospects first",
+        detail: "A ranked list replaces working a flat address list in whatever order it happens to be in.",
+      },
+      {
+        label: "Uses signals already available",
+        detail: "Pulls together home age, system age, and service history instead of requiring a new data source to get started.",
+      },
+      {
+        label: "Fits an existing outbound process",
+        detail: "Feeds a prioritized list into whatever calling, door-knocking, or CRM workflow a company already uses.",
+      },
+    ],
+    howItWorks: [
+      "Inputs: a service area or list of addresses, plus available signals such as home age, known system age, and service history.",
+      "Prospects are scored against those signals for likely replacement need.",
+      "Output is a ranked list ordered by score, for outbound calling or door-knocking prioritization.",
+      "Feeds into an existing CRM or outbound workflow rather than replacing it.",
+    ],
+    faqs: [
+      {
+        question: "Where does the underlying data come from?",
+        answer: "A combination of public property data and whatever service history a company already has on file. It works with partial data — more signal improves ranking, but a full data set isn't required to get a useful first pass.",
+      },
+      {
+        question: "Does this replace our CRM?",
+        answer: "No. It's a prioritization layer that feeds a ranked list into whatever CRM or outbound process is already in use.",
+      },
+      {
+        question: "Can it be used for maintenance outreach, not just replacement leads?",
+        answer: "Yes — the same scoring approach can be tuned toward maintenance-due signals rather than replacement-likelihood signals, depending on the campaign.",
+      },
+      {
+        question: "Does this only work for HVAC?",
+        answer: "The scoring logic is built around HVAC-specific signals like system age, but the same approach applies to other home-services trades with similar replacement-cycle dynamics.",
+      },
+    ],
+    cta: {
+      label: "Request a demo",
+      href: site.bookingUrl,
+    },
+    mockup: "hvac",
   },
 ];
 

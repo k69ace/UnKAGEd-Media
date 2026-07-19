@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/Container";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CtaSection } from "@/components/CtaSection";
 import { AppMockup } from "@/components/AppMockup";
+import { AppCard } from "@/components/AppCard";
 import { Faq } from "@/components/Faq";
 import { JsonLd } from "@/components/JsonLd";
 import { apps, getAppBySlug } from "@/lib/apps";
@@ -44,7 +44,11 @@ export default async function AppPage({
   const app = getAppBySlug(slug);
   if (!app) notFound();
 
-  const otherApps = apps.filter((a) => a.slug !== app.slug).slice(0, 2);
+  const others = apps.filter((a) => a.slug !== app.slug);
+  const otherApps = [
+    ...others.filter((a) => a.category === app.category),
+    ...others.filter((a) => a.category !== app.category),
+  ].slice(0, 2);
 
   const softwareSchema = {
     "@context": "https://schema.org",
@@ -201,17 +205,7 @@ export default async function AppPage({
             </h2>
             <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
               {otherApps.map((other) => (
-                <Link
-                  key={other.slug}
-                  href={`/apps/${other.slug}`}
-                  className="group rounded-2xl border border-border bg-background-elevated p-6 transition-colors hover:border-accent"
-                >
-                  <h3 className="text-base font-semibold text-foreground">{other.name}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">{other.tagline}</p>
-                  <span className="mt-4 inline-block text-sm font-semibold text-accent-strong group-hover:text-accent">
-                    Read more &rarr;
-                  </span>
-                </Link>
+                <AppCard key={other.slug} app={other} />
               ))}
             </div>
           </Container>
