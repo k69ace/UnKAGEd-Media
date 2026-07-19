@@ -126,6 +126,7 @@ export const apps: AppDefinition[] = [
       href: site.bookingUrl,
     },
     mockup: "estimator",
+    relatedCaseStudySlugs: ["catering-estimator-rollout"],
   },
   {
     slug: "beo-builder",

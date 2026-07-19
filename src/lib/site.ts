@@ -18,10 +18,11 @@ export type NavItem = {
   href: string;
 };
 
-// Case Studies and The Lab are added once those sections ship content (Phase 2/3).
+// The Lab is added once it ships content (Phase 3).
 export const primaryNav: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Apps", href: "/apps" },
+  { label: "Case Studies", href: "/case-studies" },
   { label: "About Kirk", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];

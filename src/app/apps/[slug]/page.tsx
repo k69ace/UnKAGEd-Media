@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/Container";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -8,6 +9,7 @@ import { AppCard } from "@/components/AppCard";
 import { Faq } from "@/components/Faq";
 import { JsonLd } from "@/components/JsonLd";
 import { apps, getAppBySlug } from "@/lib/apps";
+import { getCaseStudyBySlug } from "@/lib/caseStudies";
 import { site } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -49,6 +51,10 @@ export default async function AppPage({
     ...others.filter((a) => a.category === app.category),
     ...others.filter((a) => a.category !== app.category),
   ].slice(0, 2);
+
+  const relatedCaseStudies = (app.relatedCaseStudySlugs ?? [])
+    .map((csSlug) => getCaseStudyBySlug(csSlug))
+    .filter((cs): cs is NonNullable<typeof cs> => Boolean(cs));
 
   const softwareSchema = {
     "@context": "https://schema.org",
@@ -196,6 +202,32 @@ export default async function AppPage({
         ctaLabel={app.cta.label}
         ctaHref={app.cta.href}
       />
+
+      {relatedCaseStudies.length > 0 && (
+        <section className="border-b border-border">
+          <Container className="py-16 sm:py-20">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
+              Case study
+            </h2>
+            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {relatedCaseStudies.map((cs) => (
+                <Link
+                  key={cs.slug}
+                  href={`/case-studies/${cs.slug}`}
+                  className="group rounded-2xl border border-border bg-background-elevated p-6 transition-colors hover:border-accent"
+                >
+                  <span className="text-xs font-medium text-muted">{cs.business}</span>
+                  <h3 className="mt-3 text-base font-semibold text-foreground">{cs.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">{cs.subtitle}</p>
+                  <span className="mt-4 inline-block text-sm font-semibold text-accent-strong group-hover:text-accent">
+                    Read the case study &rarr;
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
 
       {otherApps.length > 0 && (
         <section>
