@@ -1,0 +1,1358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BMW/ISM Culinary Program Planner — Walnut Catering &amp; Events</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    /* fixed brand fills — Walnut's own navy + gold, constant across themes like a logo */
+    --navy:#122a52;
+    --navy-dark:#0b1c38;
+    --navy-mid:#1c3a6b;
+    --gold:#b8902e;
+    --gold-light:#e9c869;
+    --green:#7f9d3a;
+    --danger:#b3372c;
+    --radius:10px;
+    /* theme-variable surface tokens */
+    --bg:#f5f4f0;
+    --card:#ffffff;
+    --surface-alt:#eef1f7;
+    --line:#dfe3ea;
+    --heading:#122a52;
+    --text:#1c2430;
+    --muted:#5b6472;
+    --dash:#e6e9ef;
+    --pill-free-bg:#eaf3df; --pill-free-text:#4c6a1f;
+    --pill-premium-bg:#fbe9d8; --pill-premium-text:#9a5a10;
+    --help-bg:#f6f4ec; --help-border:#e2d6ad;
+    --shadow:0 1px 3px rgba(18,42,82,.08), 0 1px 2px rgba(18,42,82,.06);
+    --popover-shadow:0 8px 24px rgba(18,42,82,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#11151f;
+      --card:#1a2130;
+      --surface-alt:#212a3b;
+      --line:#313c50;
+      --heading:#e7ecf5;
+      --text:#dde2ea;
+      --muted:#94a1b7;
+      --dash:#2b3548;
+      --danger:#e08072;
+      --pill-free-bg:#25331b; --pill-free-text:#a7d17e;
+      --pill-premium-bg:#402a12; --pill-premium-text:#e7ac6d;
+      --help-bg:#28250f; --help-border:#5c4e22;
+      --shadow:0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.32);
+      --popover-shadow:0 8px 24px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#11151f; --card:#1a2130; --surface-alt:#212a3b; --line:#313c50;
+    --heading:#e7ecf5; --text:#dde2ea; --muted:#94a1b7; --dash:#2b3548; --danger:#e08072;
+    --pill-free-bg:#25331b; --pill-free-text:#a7d17e;
+    --pill-premium-bg:#402a12; --pill-premium-text:#e7ac6d;
+    --help-bg:#28250f; --help-border:#5c4e22;
+    --shadow:0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.32);
+    --popover-shadow:0 8px 24px rgba(0,0,0,.5);
+  }
+  :root[data-theme="light"]{
+    --bg:#f5f4f0; --card:#ffffff; --surface-alt:#eef1f7; --line:#dfe3ea;
+    --heading:#122a52; --text:#1c2430; --muted:#5b6472; --dash:#e6e9ef; --danger:#b3372c;
+    --pill-free-bg:#eaf3df; --pill-free-text:#4c6a1f;
+    --pill-premium-bg:#fbe9d8; --pill-premium-text:#9a5a10;
+    --help-bg:#f6f4ec; --help-border:#e2d6ad;
+    --shadow:0 1px 3px rgba(18,42,82,.08), 0 1px 2px rgba(18,42,82,.06);
+    --popover-shadow:0 8px 24px rgba(18,42,82,.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.4;
+  }
+  h1,h2,h3,h4{margin:0 0 .25em;font-weight:700;text-wrap:balance;}
+  button{font-family:inherit;cursor:pointer;}
+  input[type=text], input[type=number]{
+    font-family:inherit;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:6px 8px;
+    font-size:13.5px;
+    background:var(--card);
+    color:var(--text);
+  }
+  input[type=text]:focus, input[type=number]:focus, select:focus, button:focus-visible, summary:focus-visible{
+    outline:2px solid var(--gold-light);
+    outline-offset:1px;
+  }
+  select{
+    font-family:inherit;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:5px 6px;
+    font-size:13px;
+    background:var(--card);
+    color:var(--text);
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-dark) 100%);
+    color:#fff;
+    padding:18px 24px;
+  }
+  .brand-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+  .fork-badge{
+    width:34px;height:34px;border-radius:50%;
+    border:2px solid #fff;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:15px;color:var(--gold-light);
+    flex:none;
+  }
+  .brand-name{font-size:14px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:#fff;}
+  .brand-name span{color:var(--gold-light);}
+  .prog-title{font-size:22px;font-weight:800;margin-bottom:2px;}
+  .prog-meta{font-size:13px;color:#c9d4e8;}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    background:var(--card);
+    border-bottom:1px solid var(--line);
+    padding:0 24px;
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:8px;
+    position:sticky;top:0;z-index:20;
+    box-shadow:var(--shadow);
+  }
+  .tabs{display:flex;gap:2px;}
+  .tab{
+    background:none;border:none;padding:14px 16px;font-size:14px;font-weight:600;
+    color:var(--muted);border-bottom:3px solid transparent;
+  }
+  .tab.active{color:var(--heading);border-bottom-color:var(--gold);}
+  .toolbar-actions{display:flex;gap:8px;padding:10px 0;}
+  .btn{
+    border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--text);
+    padding:8px 14px;font-size:13px;font-weight:600;
+  }
+  .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .btn.primary:hover{background:var(--navy-mid);}
+  .btn.ghost{color:var(--danger);border-color:#ecd3cf;}
+  .btn.ghost:hover{background:#fbf1ef;}
+  .btn.gold{background:var(--gold);border-color:var(--gold);color:#fff;}
+  .btn.small{padding:4px 9px;font-size:12px;}
+
+  /* ---------- Totals bar ---------- */
+  .totalsbar{
+    position:sticky;top:49px;z-index:19;
+    background:var(--navy-dark);color:#fff;
+    padding:10px 24px;
+    display:flex;gap:22px;flex-wrap:wrap;align-items:baseline;
+    font-size:13px;
+  }
+  .totalsbar{font-variant-numeric:tabular-nums;}
+  .totalsbar .grand{font-size:17px;font-weight:800;color:var(--gold-light);}
+  .totalsbar .item b{display:block;font-size:15px;color:#fff;}
+  .totalsbar .item{color:#aebadb;}
+  .totalsbar .flag{
+    background:#8a5a1c;color:#fff;border-radius:5px;padding:2px 8px;font-size:11.5px;font-weight:700;
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 24px 80px;}
+  .daytabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .daytab{
+    background:var(--card);border:1px solid var(--line);border-radius:8px;
+    padding:10px 16px;font-weight:700;font-size:13.5px;color:var(--heading);
+  }
+  .daytab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .daytab small{display:block;font-weight:500;font-size:11px;color:inherit;opacity:.75;}
+
+  .daypart-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden;
+  }
+  .daypart-head{
+    background:var(--surface-alt);padding:14px 18px;border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;
+  }
+  .daypart-head h3{font-size:16px;color:var(--heading);}
+  .daypart-head .time{font-size:12px;color:var(--muted);}
+  .daypart-guests{display:flex;align-items:center;gap:8px;font-size:12.5px;}
+  .daypart-guests input{width:70px;}
+  .daypart-sub{font-size:12px;color:var(--muted);margin-top:4px;max-width:520px;}
+  .daypart-total{font-size:19px;font-weight:800;color:var(--heading);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .daypart-total small{display:block;font-weight:500;font-size:11px;color:var(--muted);}
+
+  .daypart-body{padding:14px 18px;}
+  .category{border:1px solid var(--line);border-radius:8px;margin-bottom:12px;background:var(--surface-alt);}
+  .category:last-child{margin-bottom:0;}
+  .category-head{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .category-head input[type=text]{font-weight:700;font-size:13.5px;flex:1;min-width:140px;border-color:transparent;background:transparent;color:var(--text);}
+  .category-head input[type=text]:hover, .category-head input[type=text]:focus{border-color:var(--line);background:var(--card);}
+  .cat-warn{font-size:11px;color:var(--danger);font-weight:600;}
+  .items{padding:6px 12px 10px;}
+  .item-row{
+    display:grid;grid-template-columns: 1.1fr 1.6fr auto auto auto auto;
+    gap:8px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--dash);
+  }
+  .item-row:last-child{border-bottom:none;}
+  .item-row input[type=text]{width:100%;}
+  .split-wrap{display:flex;flex-direction:column;font-size:10.5px;color:var(--muted);}
+  .split-wrap input{width:64px;}
+  .up-wrap{display:flex;flex-direction:column;font-size:10.5px;color:var(--muted);}
+  .up-wrap input{width:64px;}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;}
+  .pill-free{background:var(--pill-free-bg);color:var(--pill-free-text);}
+  .pill-premium{background:var(--pill-premium-bg);color:var(--pill-premium-text);}
+
+  details.swapper, details.mover{position:relative;}
+  details.swapper summary, details.mover summary{
+    list-style:none;font-size:12px;font-weight:700;color:var(--heading);
+    border:1px solid var(--line);border-radius:6px;padding:5px 9px;background:var(--card);white-space:nowrap;
+  }
+  details.swapper summary::-webkit-details-marker, details.mover summary::-webkit-details-marker{display:none;}
+  details[open] summary{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .popover{
+    position:absolute;right:0;top:calc(100% + 4px);z-index:30;
+    background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:var(--popover-shadow);
+    padding:10px;width:300px;max-height:340px;overflow:auto;
+  }
+  .suggest-item{
+    display:flex;justify-content:space-between;gap:8px;align-items:center;
+    padding:7px 6px;border-radius:6px;border-bottom:1px solid var(--dash);
+  }
+  .suggest-item:last-child{border-bottom:none;}
+  .suggest-name{font-size:12.5px;font-weight:600;}
+  .suggest-desc{font-size:11px;color:var(--muted);}
+  .mover-body{display:flex;flex-direction:column;gap:6px;width:200px;}
+  .mover-body label{font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:2px;}
+  .row-actions{display:flex;gap:6px;align-items:center;}
+  .cat-actions, .daypart-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+
+  .bar-card .daypart-body{display:flex;gap:24px;flex-wrap:wrap;align-items:center;}
+  .bar-toggle{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;}
+  .bar-menu-list{font-size:12px;color:var(--muted);max-width:560px;}
+
+  .helpline{font-size:11.5px;color:var(--muted);background:var(--help-bg);border:1px dashed var(--help-border);border-radius:6px;padding:6px 10px;margin:8px 0 0;}
+
+  .day-quickset{display:flex;align-items:center;gap:8px;margin-bottom:14px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;flex-wrap:wrap;}
+  .day-quickset input{width:80px;}
+
+  /* ---------- Summary / print ---------- */
+  .summary-wrap{max-width:900px;margin:0 auto;padding:24px;}
+  .summary-wrap h2{color:var(--heading);border-bottom:2px solid var(--gold);padding-bottom:6px;margin-top:34px;}
+  .summary-wrap h2:first-child{margin-top:0;}
+  table.sum-table{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:13px;font-variant-numeric:tabular-nums;}
+  table.sum-table th, table.sum-table td{border:1px solid var(--line);padding:7px 10px;text-align:left;}
+  table.sum-table th{background:var(--surface-alt);color:var(--heading);}
+  table.sum-table td.num, table.sum-table th.num{text-align:right;}
+  .sum-day-block{margin-bottom:22px;}
+  .sum-day-title{background:var(--navy);color:#fff;padding:8px 12px;border-radius:6px 6px 0 0;font-weight:700;font-size:14px;}
+  .sum-day-body{border:1px solid var(--line);border-top:none;border-radius:0 0 6px 6px;padding:12px 16px;}
+  .sum-cat{margin-bottom:8px;}
+  .sum-cat h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);margin-bottom:3px;}
+  .sum-item{font-size:13.5px;margin:0 0 2px;}
+  .sum-item .d{color:var(--muted);font-size:12px;}
+  .terms p{font-size:12.5px;color:var(--text);}
+  .terms h3{font-size:13.5px;color:var(--heading);margin-top:16px;}
+  .sig-table td{height:34px;vertical-align:bottom;}
+
+  .hidden{display:none !important;}
+  footer.appfoot{text-align:center;font-size:11px;color:var(--muted);padding:20px;}
+
+  /* ---------- Submit modal ---------- */
+  .overlay{
+    position:fixed;inset:0;z-index:50;background:rgba(11,20,38,.55);
+    display:flex;align-items:center;justify-content:center;padding:16px;
+  }
+  .modal{
+    background:var(--card);border-radius:12px;box-shadow:var(--popover-shadow);
+    width:100%;max-width:440px;padding:22px;
+  }
+  .modal h3{color:var(--heading);font-size:17px;}
+  .modal-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px;}
+  .modal-field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:12px;}
+  .modal-field input, .modal-field textarea{font-family:inherit;font-size:13.5px;font-weight:400;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--card);resize:vertical;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px;}
+  .submit-status{font-size:12.5px;border-radius:6px;padding:8px 10px;margin-bottom:10px;}
+  .submit-status.ok{background:var(--pill-free-bg);color:var(--pill-free-text);}
+  .submit-status.warn{background:var(--pill-premium-bg);color:var(--pill-premium-text);}
+  .submit-status.err{background:var(--pill-premium-bg);color:var(--danger);}
+  .submit-status a{color:inherit;text-decoration:underline;}
+
+  @media print{
+    :root{
+      --bg:#fff; --card:#fff; --surface-alt:#eef1f7; --line:#c9cfdb;
+      --heading:#122a52; --text:#1c2430; --muted:#5b6472;
+    }
+    .topbar, .toolbar, .totalsbar, .daytabs, #planView, footer.appfoot{display:none !important;}
+    #summaryView{display:block !important;}
+    body{background:#fff;}
+    .summary-wrap{padding:0;max-width:none;}
+    button, details summary{display:none !important;}
+  }
+  @media (max-width:720px){
+    .item-row{grid-template-columns:1fr;}
+    .totalsbar{gap:12px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand-row">
+    <div class="fork-badge">W</div>
+    <div class="brand-name">Walnut <span>Catering + Events</span></div>
+  </div>
+  <div class="prog-title" id="progTitle">BMW Executive Hospitality &amp; Culinary Program</div>
+  <div class="prog-meta" id="progMeta">August 20–23, 2026 · Private Residence near Bellerive Country Club, St. Louis, Missouri · Prepared for ISM | Executive Hosting Advisory</div>
+</div>
+
+<div class="toolbar">
+  <div class="tabs">
+    <button class="tab active" data-action="switch-tab" data-tab="plan">Planner</button>
+    <button class="tab" data-action="switch-tab" data-tab="summary">Summary &amp; Print</button>
+  </div>
+  <div class="toolbar-actions">
+    <button class="btn ghost" data-action="reset">Reset to Original Proposal</button>
+    <button class="btn primary" data-action="print">Print / Save PDF</button>
+    <button class="btn gold" data-action="submit-open">Submit to Walnut Catering</button>
+  </div>
+</div>
+
+<div class="totalsbar" id="totalsbar"></div>
+
+<div id="planView" class="wrap">
+  <div class="daytabs" id="dayTabs"></div>
+  <div id="dayContent"></div>
+</div>
+
+<div id="summaryView" class="summary-wrap hidden"></div>
+
+<footer class="appfoot">Built for Walnut Catering &amp; Events · Adjustments here are for planning purposes — final pricing is confirmed in the signed catering agreement.</footer>
+
+<div id="submitOverlay" class="overlay hidden">
+  <div class="modal">
+    <h3>Submit This Menu to Walnut Catering</h3>
+    <p class="modal-sub">This saves your current selections and opens an email draft to your Walnut Catering contacts. You can submit more than once — every submission is kept, so send it again any time you make changes.</p>
+    <label class="modal-field">Your name / company
+      <input type="text" id="submitName" value="ISM | Executive Hosting Advisory">
+    </label>
+    <label class="modal-field">Notes for Walnut (optional)
+      <textarea id="submitNotes" rows="3" placeholder="Anything you want them to know about these changes…"></textarea>
+    </label>
+    <div id="submitStatus" class="submit-status hidden"></div>
+    <div class="modal-actions">
+      <button class="btn" data-action="submit-cancel">Cancel</button>
+      <button class="btn gold" data-action="submit-send" id="submitSendBtn">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+var STORAGE_KEY = "walnut_bmw_ism_planner_v2";
+
+/* ---- Submission backend (fill in once the Supabase project exists) ----
+   SUPABASE_URL:      Project Settings > API > Project URL (e.g. https://xxxxx.supabase.co)
+   SUPABASE_ANON_KEY: Project Settings > API > "anon" "public" key (NOT the service_role key)
+   ADMIN_URL:         where admin.html ends up hosted, used to build a deep link in the
+                       notification email so Kirk/Eric can jump straight to a submission.
+   Until SUPABASE_URL is set, Submit still works — it just skips the database save and
+   goes straight to the email draft / clipboard fallback so nothing is lost in the meantime. */
+var SUPABASE_URL = "https://notxhwtwaytkcxmvflgd.supabase.co";
+var SUPABASE_ANON_KEY = "sb_publishable_0Ofdv-K5-G6Hb0ErtEZfXg_hHdKtQQB";
+var ADMIN_URL = "";
+var SUBMIT_RECIPIENTS = ["kirk@unkagedmedia.com", "eric@eatwalnut.com"];
+
+var PRICING = { breakfast: 28.95, lunch: 29.95, reception: 35.95, bar: 45.00 };
+var DAYPART_LABEL = { breakfast:"Breakfast", lunch:"Lunch", reception:"Evening Reception" };
+var DAYPART_TIME_DEFAULT = { breakfast:"7:00–11:00 a.m.", lunch:"12:00–3:00 p.m.", reception:"4:00–7:00 p.m." };
+var TYPE_LABEL = {
+  omeletStation:"Omelet Station", hotBuffet:"Hot Breakfast Buffet", continental:"Continental Display",
+  breakfastFeature:"Breakfast Feature", salad:"Salad", entrees:"Entrées", accompaniment:"Accompaniment",
+  dessert:"Dessert", chefCarved:"Chef-Carved Feature", chilledDisplay:"Chilled Display",
+  horsDoeuvres:"Displayed Hors d'oeuvres", custom:"Item"
+};
+
+/* =========================================================
+   SUGGESTION CATALOG
+   (Curated alternates at comparable cost tiers to the original
+   menu; a few flagged as premium upcharges per common catering
+   practice for specialty proteins/seafood.)
+========================================================= */
+var SUGGESTIONS = {
+  breakfastFeature: [
+    {name:"Belgian Waffle Bar", desc:"Fresh berries, whipped cream, chocolate shavings, warm syrup", upcharge:0},
+    {name:"Shakshuka Station", desc:"Poached eggs in spiced tomato sauce, warm pita", upcharge:0},
+    {name:"Chilaquiles", desc:"Crispy tortillas, salsa verde, queso fresco, crema, fried egg", upcharge:0},
+    {name:"Smoked Salmon & Bagel Display", desc:"House-cured salmon, cream cheese, classic garnishes", upcharge:2.5},
+    {name:"Steak & Eggs Station", desc:"Chef-attended, petite sirloin medallions, eggs to order", upcharge:4.0}
+  ],
+  salad: [
+    {name:"Caesar Salad", desc:"Romaine, parmesan, garlic croutons, white anchovy dressing", upcharge:0},
+    {name:"Wedge Salad", desc:"Iceberg, bacon, blue cheese, cherry tomato, buttermilk ranch", upcharge:0},
+    {name:"Autumn Harvest Salad", desc:"Mixed greens, roasted squash, dried cranberries, pepitas, cider vinaigrette", upcharge:0},
+    {name:"Caprese Salad", desc:"Heirloom tomato, fresh mozzarella, basil, balsamic reduction", upcharge:0.5},
+    {name:"Southwest Chopped Salad", desc:"Romaine, black beans, corn, cotija, chipotle-lime dressing", upcharge:0}
+  ],
+  entrees: [
+    {name:"Chicken Piccata", desc:"Lemon-caper butter sauce", upcharge:0},
+    {name:"Chicken Marsala", desc:"Mushroom marsala wine sauce", upcharge:0},
+    {name:"Blackened Mahi Mahi", desc:"Mango salsa", upcharge:1.5},
+    {name:"Braised Short Ribs", desc:"Red wine jus", upcharge:2.5},
+    {name:"Grilled Flank Steak", desc:"Chimichurri", upcharge:1.0},
+    {name:"Stuffed Portobello (Vegetarian)", desc:"Goat cheese and spinach", upcharge:0},
+    {name:"Filet Mignon Medallions", desc:"Peppercorn demi", upcharge:8.5},
+    {name:"Lobster Mac and Cheese Station", desc:"Chef-attended, gruyère cream sauce", upcharge:6.0}
+  ],
+  accompaniment: [
+    {name:"Roasted Garlic Mashed Potatoes", desc:"", upcharge:0},
+    {name:"Grilled Seasonal Vegetables", desc:"", upcharge:0},
+    {name:"Herb Roasted Fingerling Potatoes", desc:"", upcharge:0},
+    {name:"Charred Broccolini", desc:"Lemon, chili flake", upcharge:0},
+    {name:"Mac and Cheese Gratin", desc:"", upcharge:0.5},
+    {name:"Southern Style Green Beans", desc:"", upcharge:0}
+  ],
+  dessert: [
+    {name:"Chocolate Mousse Cups", desc:"", upcharge:0},
+    {name:"New York Cheesecake Bites", desc:"", upcharge:0},
+    {name:"Seasonal Fruit Tart", desc:"", upcharge:0},
+    {name:"Bourbon Bread Pudding", desc:"Warm caramel sauce", upcharge:0},
+    {name:"Assorted Macarons", desc:"", upcharge:0.5},
+    {name:"Mini Key Lime Pies", desc:"", upcharge:0}
+  ],
+  chefCarved: [
+    {name:"Herb-Crusted Prime Rib", desc:"Natural au jus", upcharge:3.0},
+    {name:"Honey Glazed Ham", desc:"Whole grain mustard sauce", upcharge:0},
+    {name:"Cedar Plank Salmon", desc:"Maple-dijon glaze", upcharge:1.5},
+    {name:"Rosemary Garlic Leg of Lamb", desc:"Mint gremolata", upcharge:4.5},
+    {name:"Whole Roasted Beef Tenderloin", desc:"Red wine demi", upcharge:7.0}
+  ],
+  chilledDisplay: [
+    {name:"Charcuterie & Artisan Cheese Board", desc:"Cured meats, artisan cheese, preserves, crackers", upcharge:1.0},
+    {name:"Chilled Shrimp Cocktail Display", desc:"Classic cocktail sauce, lemon", upcharge:2.0},
+    {name:"Mediterranean Mezze Display", desc:"Hummus, baba ganoush, olives, warm pita", upcharge:0},
+    {name:"Raw Bar", desc:"Oysters, shrimp, crab claws on ice", upcharge:9.0}
+  ],
+  horsDoeuvres: [
+    {name:"Bacon-Wrapped Dates", desc:"Almond stuffed, balsamic glaze", upcharge:0},
+    {name:"Caprese Skewers", desc:"Cherry tomato, mozzarella, basil", upcharge:0},
+    {name:"Mini Beef Sliders", desc:"American cheese, pickle, house sauce", upcharge:0.5},
+    {name:"Spanakopita Triangles", desc:"Spinach and feta in phyllo", upcharge:0},
+    {name:"Coconut Shrimp", desc:"Sweet chili dipping sauce", upcharge:1.5},
+    {name:"Beef Wellington Bites", desc:"Puff pastry, mushroom duxelles", upcharge:3.0},
+    {name:"Ahi Tuna Poke Spoons", desc:"Sesame, scallion, sriracha aioli", upcharge:4.0}
+  ],
+  omeletStation: [
+    {name:"Add Smoked Salmon Garnish", desc:"To omelet station toppings", upcharge:1.0}
+  ],
+  hotBuffet: [
+    {name:"Biscuits and Sausage Gravy", desc:"Add to hot buffet", upcharge:0}
+  ],
+  continental: [
+    {name:"Individual Overnight Oats", desc:"Add to continental display", upcharge:0.5}
+  ]
+};
+
+/* =========================================================
+   DEFAULT PROGRAM DATA (built from the signed proposal)
+========================================================= */
+var _uidSeq = 0;
+function uid(prefix){ _uidSeq += 1; return prefix + "_" + _uidSeq.toString(36); }
+
+function mkItem(name, desc, upcharge){
+  return { id: uid("item"), name: name, desc: desc || "", upcharge: upcharge || 0, splitCount: null };
+}
+function mkCategory(prefix, name, type, items){
+  return { id: uid(prefix), name: name, type: type, items: items };
+}
+function commonBreakfastCats(prefix){
+  return [
+    mkCategory(prefix+"-omelet", "Chef-Attended Omelet Station", "omeletStation", [
+      mkItem("Chef-Attended Omelet Station", "Eggs, egg whites, vegan eggs available, assorted cheeses, bacon, sausage, crab meat, shrimp, mushrooms, peppers, onions")
+    ]),
+    mkCategory(prefix+"-hot", "Hot Breakfast Buffet", "hotBuffet", [
+      mkItem("Hot Breakfast Buffet", "Bacon, turkey sausage, breakfast potatoes")
+    ]),
+    mkCategory(prefix+"-cont", "Continental Breakfast Display", "continental", [
+      mkItem("Continental Breakfast Display", "Fresh fruit, mini muffins, donuts, danishes, granola bars, yogurt")
+    ])
+  ];
+}
+function featuredCat(prefix, label, items){
+  return mkCategory(prefix+"-feat", label, "breakfastFeature", items.map(function(i){ return mkItem(i[0], i[1]); }));
+}
+
+function buildDay(id, label, guests, breakfastFeatureLabel, breakfastFeatureItems, lunchSaladName, lunchSaladDesc, entrees, accompanimentName, accompanimentDesc, dessertName, dessertDesc, carvedName, carvedDesc, chilledName, chilledDesc, horsList){
+  var bfPrefix = id+"-bf", luPrefix = id+"-lu", erPrefix = id+"-er";
+  return {
+    id: id,
+    label: label,
+    guests: guests,
+    breakfast: {
+      guests: guests, time: DAYPART_TIME_DEFAULT.breakfast,
+      categories: commonBreakfastCats(bfPrefix).concat([ featuredCat(bfPrefix, breakfastFeatureLabel, breakfastFeatureItems) ])
+    },
+    lunch: {
+      guests: guests, time: DAYPART_TIME_DEFAULT.lunch,
+      categories: [
+        mkCategory(luPrefix+"-salad", "Salad", "salad", [ mkItem(lunchSaladName, lunchSaladDesc) ]),
+        mkCategory(luPrefix+"-ent", "Entrées", "entrees", entrees.map(function(e){ return mkItem(e[0], e[1]); })),
+        mkCategory(luPrefix+"-acc", "Accompaniments", "accompaniment", [ mkItem(accompanimentName, accompanimentDesc) ]),
+        mkCategory(luPrefix+"-des", "Desserts", "dessert", [ mkItem(dessertName, dessertDesc) ])
+      ]
+    },
+    reception: {
+      guests: guests, time: DAYPART_TIME_DEFAULT.reception,
+      categories: [
+        mkCategory(erPrefix+"-carve", "Chef-Carved Feature", "chefCarved", [ mkItem(carvedName, carvedDesc) ]),
+        mkCategory(erPrefix+"-chill", "Chilled Display", "chilledDisplay", [ mkItem(chilledName, chilledDesc) ]),
+        mkCategory(erPrefix+"-hors", "Displayed Hors d'oeuvres", "horsDoeuvres", horsList.map(function(h){ return mkItem(h[0], h[1]); }))
+      ]
+    },
+    bar: { enabled: true, guests: guests, time: "7:00 a.m.–7:00 p.m." }
+  };
+}
+
+function buildDefaultData(){
+  return {
+    days: [
+      buildDay("thu", "Thursday, August 20, 2026", 198,
+        "New Orleans Inspired Breakfast Features",
+        [ ["Buttermilk Biscuit", "With andouille sausage gravy"], ["Banana Foster Crepes", ""] ],
+        "Greek Salad", "Iceberg, romaine, tomato, cucumber, feta, kalamata olives",
+        [ ["Tuscan Balsamic Grilled Chicken", ""], ["Herb-Crusted Sliced Tenderloin", "Red wine shallot demi and horseradish cream"] ],
+        "Wild Rice and Quinoa Pilaf", "",
+        "Assorted Petit Fours", "",
+        "Cajun Dusted Roasted Pork Loin", "Wild mushroom and cranberry demi",
+        "Chilled Seafood Display", "Chilled shrimp and PEI mussels with lemon, cocktail sauce and old bay remoulade",
+        [ ["Antipasto Board", "Italian meats, cheeses and marinated vegetables"], ["Jumbo Lump Crabmeat Stuffed Mushrooms", ""] ]
+      ),
+      buildDay("fri", "Friday, August 21, 2026", 198,
+        "French Country Breakfast Features",
+        [ ["Crème Brûlée French Toast", ""], ["Spinach & Bacon Quiche", ""] ],
+        "Strawberry Balsamico", "Strawberries, field greens, goat cheese, candied almonds",
+        [ ["Shaved Prime Rib", "Brioche sliders, provolone, mushrooms and banana peppers"], ["Walnut Crusted Atlantic Salmon", "Spicy orange gastrique"] ],
+        "Lemon-Herb Spinach Orzo", "",
+        "Assorted Petit Fours", "",
+        "Roasted Turkey Breast", "White wine thyme velouté",
+        "Vegetable Crudité", "Green goddess dressing, roasted red pepper hummus and spinach artichoke dip (served warm)",
+        [ ["Antipasto Board", "Italian meats, cheeses and marinated vegetables"], ["Angus Meatballs", "Roasted red pepper BBQ"] ]
+      ),
+      buildDay("sat", "Saturday, August 22, 2026", 190,
+        "American Breakfast Features",
+        [ ["Sweet Cream Pancakes", "Butter and syrup"], ["Avocado Toast", "Egg and candied bacon"] ],
+        "St. Louis Style Salad", "Artichokes, pimentos, red onions, parmesan",
+        [ ["Crab Stuffed Sole", "Lemon-butter caper sauce"], ["Tortellini allá Panna", "Beef tortellini, mushrooms, spinach, peas, parmesan cream"] ],
+        "Fire Roasted Corn Succotash", "",
+        "Assorted Petit Fours", "",
+        "Coffee Crusted Beef Strip Loin", "Cabernet demi & chimichurri",
+        "Vegetable Crudité", "Chilled dips and spinach artichoke dip (served warm)",
+        [ ["Walnut Chicken Salad in Phyllo Cups", ""], ["Potstickers", "Ponzu"], ["Hot Honey Chicken Sliders", ""] ]
+      ),
+      buildDay("sun", "Sunday, August 23, 2026", 190,
+        "Southwest Breakfast Features",
+        [ ["Beef Birria Breakfast Taco", ""], ["Breakfast Burritos", ""] ],
+        "Summertime Pasta Salad", "",
+        [ ["Wagyu Beef Burgers", "Brioche buns, American cheese, roasted garlic peppercorn sauce, crispy onions, lettuce & tomato"], ["Pulled Chicken and Pork", "Slider buns, bbq sauces, pickled red onions"] ],
+        "Southern Baked Beans and Cornbread", "",
+        "Warm Peach Cobbler", "With fresh whipped cream",
+        "French Onion Brisket", "French onion au jus and whole grain mustard cream sauce",
+        "Vegetable Crudité", "Chilled dips and spinach artichoke dip (served warm)",
+        [ ["New England Mini Crab Cakes", "Old bay remoulade"], ["Chicken Spiedini Bites", ""], ["Sweet Chili Boneless Wings", ""] ]
+      )
+    ]
+  };
+}
+
+/* =========================================================
+   STATE
+========================================================= */
+var state = null;
+var activeDay = "thu";
+var activeTab = "plan";
+var lastTabBeforePrint = "plan";
+
+function loadState(){
+  try{
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  }catch(e){}
+  return buildDefaultData();
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+function resetState(){
+  if (!confirm("Reset all changes back to the original Walnut Catering proposal? This cannot be undone.")) return;
+  state = buildDefaultData();
+  saveState();
+  activeDay = "thu";
+  renderAll();
+}
+
+/* =========================================================
+   HELPERS
+========================================================= */
+function money(n){
+  n = Number(n)||0;
+  return "$" + n.toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function moneyRound(n){
+  n = Number(n)||0;
+  return "$" + Math.round(n).toLocaleString("en-US");
+}
+function escapeHtml(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function getDay(id){
+  for (var i=0;i<state.days.length;i++){ if (state.days[i].id===id) return state.days[i]; }
+  return null;
+}
+function findItemLocation(itemId){
+  for (var d=0; d<state.days.length; d++){
+    var day = state.days[d];
+    var keys = ["breakfast","lunch","reception"];
+    for (var k=0;k<keys.length;k++){
+      var dp = day[keys[k]];
+      for (var c=0;c<dp.categories.length;c++){
+        var cat = dp.categories[c];
+        for (var i=0;i<cat.items.length;i++){
+          if (cat.items[i].id === itemId){
+            return { day:day, daypartKey:keys[k], daypart:dp, category:cat, catIndex:c, itemIndex:i, item:cat.items[i] };
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+function findCategory(dayId, daypartKey, catId){
+  var day = getDay(dayId);
+  if (!day) return null;
+  var dp = day[daypartKey];
+  for (var i=0;i<dp.categories.length;i++){ if (dp.categories[i].id===catId) return dp.categories[i]; }
+  return null;
+}
+
+/* =========================================================
+   COMPUTATION
+========================================================= */
+function upchargeTotal(daypart){
+  var sum = 0;
+  daypart.categories.forEach(function(cat){
+    cat.items.forEach(function(item){
+      if (item.upcharge && item.upcharge > 0){
+        var n = (item.splitCount != null && item.splitCount !== "") ? Number(item.splitCount) : daypart.guests;
+        sum += item.upcharge * n;
+      }
+    });
+  });
+  return sum;
+}
+function daypartTotal(daypart, base){
+  return (daypart.guests * base) + upchargeTotal(daypart);
+}
+function computeDay(day){
+  var bf = daypartTotal(day.breakfast, PRICING.breakfast);
+  var lu = daypartTotal(day.lunch, PRICING.lunch);
+  var re = daypartTotal(day.reception, PRICING.reception);
+  var bar = day.bar.enabled ? (day.bar.guests * PRICING.bar) : 0;
+  var food = bf+lu+re;
+  return { bf:bf, lu:lu, re:re, bar:bar, food:food, total:food+bar };
+}
+function computeProgram(){
+  var totals = { food:0, bar:0, total:0, guestDays:0, perDay:{} };
+  state.days.forEach(function(day){
+    var c = computeDay(day);
+    totals.food += c.food; totals.bar += c.bar; totals.total += c.total;
+    totals.guestDays += Math.max(day.breakfast.guests, day.lunch.guests, day.reception.guests, day.bar.guests);
+    totals.perDay[day.id] = c;
+  });
+  return totals;
+}
+
+/* =========================================================
+   SUBMIT TO WALNUT
+========================================================= */
+function buildSubmissionSummaryText(clientName, notes, submissionId){
+  var t = computeProgram();
+  var lines = [];
+  lines.push("BMW Executive Hospitality & Culinary Program — Adjusted Menu Submission");
+  lines.push("Submitted by: " + (clientName || "(no name given)") + " on " + new Date().toLocaleString("en-US"));
+  lines.push("");
+  state.days.forEach(function(day){
+    var c = t.perDay[day.id];
+    lines.push(day.label.split(",")[0] + " — Breakfast " + day.breakfast.guests + " · Lunch " + day.lunch.guests +
+      " · Reception " + day.reception.guests + (day.bar.enabled ? (" · Bar " + day.bar.guests) : " · Bar off") +
+      " — Day Total " + moneyRound(c.total));
+  });
+  lines.push("");
+  lines.push("PROGRAM TOTAL: " + moneyRound(t.total) + "  (" + moneyRound(t.food) + " food + " + moneyRound(t.bar) + " bar, " + t.guestDays.toLocaleString() + " guest-days)");
+  lines.push("");
+  lines.push("Notes from client:");
+  lines.push(notes && notes.trim() ? notes.trim() : "(none)");
+  if (submissionId){
+    lines.push("");
+    lines.push("Reference ID: #" + submissionId);
+    if (ADMIN_URL){
+      lines.push("Full day-by-day menu: " + ADMIN_URL + (ADMIN_URL.indexOf("?")>-1?"&":"?") + "id=" + submissionId);
+    } else {
+      lines.push("(Full itemized menu was saved with this submission — look it up by reference ID in the submissions admin page.)");
+    }
+  } else {
+    lines.push("");
+    lines.push("Note: this submission could not be saved to the shared database — see details below. The full menu is still saved in the client's own browser.");
+  }
+  return lines.join("\n");
+}
+function openEmailDraft(clientName, notes, submissionId){
+  var subject = "Menu Submission — " + (clientName || "ISM | Executive Hosting Advisory") + " (" + new Date().toLocaleDateString("en-US") + ")";
+  var body = buildSubmissionSummaryText(clientName, notes, submissionId);
+  var mailto = "mailto:" + SUBMIT_RECIPIENTS.join(",") + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  window.location.href = mailto;
+}
+function submitOpen(){
+  document.getElementById("submitStatus").className = "submit-status hidden";
+  document.getElementById("submitStatus").innerHTML = "";
+  document.getElementById("submitOverlay").classList.remove("hidden");
+}
+function submitCancel(){
+  document.getElementById("submitOverlay").classList.add("hidden");
+}
+function setSubmitStatus(kind, html){
+  var el = document.getElementById("submitStatus");
+  el.className = "submit-status " + kind;
+  el.innerHTML = html;
+}
+function submitSend(){
+  var name = document.getElementById("submitName").value.trim();
+  var notes = document.getElementById("submitNotes").value;
+  var btn = document.getElementById("submitSendBtn");
+  var t = computeProgram();
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+  setSubmitStatus("warn", "Saving your submission…");
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY){
+    setSubmitStatus("err",
+      "This planner isn't connected to a database yet, so this submission won't be saved centrally. " +
+      "Your changes are still safe in this browser. " +
+      '<button class="btn small" data-action="submit-fallback-email" style="margin-top:6px">Open Email Draft Anyway</button> ' +
+      '<button class="btn small" data-action="submit-fallback-copy" style="margin-top:6px">Copy Summary</button>');
+    btn.disabled = false; btn.textContent = "Send";
+    return;
+  }
+
+  var payload = {
+    client_name: name,
+    notes: notes,
+    program_total: Number(t.total.toFixed(2)),
+    program_food_total: Number(t.food.toFixed(2)),
+    program_bar_total: Number(t.bar.toFixed(2)),
+    guest_days: t.guestDays,
+    state: state
+  };
+
+  fetch(SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/submissions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+      "Prefer": "return=representation"
+    },
+    body: JSON.stringify(payload)
+  }).then(function(res){
+    if (!res.ok) return res.text().then(function(txt){ throw new Error("HTTP " + res.status + ": " + txt); });
+    return res.json();
+  }).then(function(rows){
+    var id = rows && rows[0] && rows[0].id;
+    openEmailDraft(name, notes, id);
+    setSubmitStatus("ok", "Saved" + (id ? (" as reference #" + id) : "") + ". An email draft to " + SUBMIT_RECIPIENTS.join(" & ") + " should have opened — just hit send.");
+    btn.disabled = false; btn.textContent = "Send Another";
+  }).catch(function(err){
+    setSubmitStatus("err",
+      "Couldn't reach the database (" + escapeHtml(err.message) + "). This can happen if the page is sandboxed (e.g. a preview) or the database isn't reachable right now. Your changes are still safe in this browser. " +
+      '<button class="btn small" data-action="submit-fallback-email" style="margin-top:6px">Open Email Draft Anyway</button> ' +
+      '<button class="btn small" data-action="submit-fallback-copy" style="margin-top:6px">Copy Summary</button>');
+    btn.disabled = false; btn.textContent = "Send";
+  });
+}
+function submitFallbackEmail(){
+  var name = document.getElementById("submitName").value.trim();
+  var notes = document.getElementById("submitNotes").value;
+  openEmailDraft(name, notes, null);
+}
+function submitFallbackCopy(){
+  var name = document.getElementById("submitName").value.trim();
+  var notes = document.getElementById("submitNotes").value;
+  var text = buildSubmissionSummaryText(name, notes, null);
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      setSubmitStatus("ok", "Summary copied to your clipboard — paste it into an email or message.");
+    }).catch(function(){
+      window.prompt("Copy this summary:", text);
+    });
+  } else {
+    window.prompt("Copy this summary:", text);
+  }
+}
+
+/* =========================================================
+   RENDER — shell
+========================================================= */
+function renderAll(){
+  renderDayTabs();
+  renderDayContent();
+  renderTotals();
+  renderSummary();
+}
+function renderDayTabs(){
+  var el = document.getElementById("dayTabs");
+  el.innerHTML = state.days.map(function(day){
+    var short = day.label.split(",")[0];
+    var dateStr = day.label.split(",").slice(1).join(",").trim();
+    return '<button class="daytab'+(day.id===activeDay?' active':'')+'" data-action="switch-day" data-day="'+day.id+'">'+
+      escapeHtml(short)+'<small>'+escapeHtml(dateStr)+'</small></button>';
+  }).join("");
+}
+function renderTotals(){
+  var t = computeProgram();
+  var el = document.getElementById("totalsbar");
+  var dayRows = state.days.map(function(day){
+    var c = t.perDay[day.id];
+    return '<div class="item">'+escapeHtml(day.label.split(",")[0])+'<b>'+moneyRound(c.total)+'</b></div>';
+  }).join("");
+  el.innerHTML = dayRows +
+    '<div class="item">Program Guest-Days<b>'+t.guestDays.toLocaleString()+'</b></div>' +
+    '<div class="item grand">Program Total<b style="font-size:19px">'+moneyRound(t.total)+'</b></div>';
+}
+
+/* =========================================================
+   RENDER — planner day content
+========================================================= */
+function renderDayContent(){
+  var day = getDay(activeDay);
+  var el = document.getElementById("dayContent");
+  if (!day){ el.innerHTML=""; return; }
+
+  var html = '';
+  html += '<div class="day-quickset">'+
+    '<strong>Quick-set attendance for '+escapeHtml(day.label.split(",")[0])+':</strong> '+
+    '<input type="number" min="0" id="quickGuests_'+day.id+'" value="'+day.guests+'"> '+
+    '<button class="btn small gold" data-action="day-apply-all" data-day="'+day.id+'">Apply to Breakfast, Lunch, Reception &amp; Bar</button>'+
+    '</div>';
+
+  ["breakfast","lunch","reception"].forEach(function(key){
+    html += renderDaypart(day, key);
+  });
+  html += renderBar(day);
+
+  el.innerHTML = html;
+}
+
+function renderDaypart(day, key){
+  var dp = day[key];
+  var base = PRICING[key];
+  var c = daypartTotal(dp, base);
+  var upcharges = upchargeTotal(dp);
+  var help = "Priced at a flat "+money(base)+"/guest for this meal period. Swapping or moving dishes doesn't change the rate — only the guest count or an explicit premium item does.";
+
+  var catsHtml = dp.categories.map(function(cat){ return renderCategory(day, key, cat, dp); }).join("");
+
+  return '<div class="daypart-card" data-day="'+day.id+'" data-daypart="'+key+'">'+
+    '<div class="daypart-head">'+
+      '<div><h3>'+DAYPART_LABEL[key]+'</h3><div class="time">'+escapeHtml(dp.time)+'</div></div>'+
+      '<div class="daypart-guests">Guests <input type="number" min="0" data-action="daypart-guests" data-day="'+day.id+'" data-daypart="'+key+'" value="'+dp.guests+'"></div>'+
+      '<div class="daypart-total" id="dp-total-'+day.id+'-'+key+'">'+moneyRound(c)+'<small>'+money(base)+'/guest'+(upcharges>0?' + '+money(upcharges)+' premium':'')+'</small></div>'+
+    '</div>'+
+    '<div class="daypart-body">'+
+      catsHtml+
+      '<div class="daypart-actions"><button class="btn small" data-action="add-category" data-day="'+day.id+'" data-daypart="'+key+'">+ Add Category</button></div>'+
+      '<div class="helpline">'+help+'</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderCategory(day, daypartKey, cat, dp){
+  var splitTotal = 0, splitCountUsed = false;
+  cat.items.forEach(function(it){ if (it.splitCount!=null && it.splitCount!==""){ splitTotal += Number(it.splitCount); splitCountUsed = true; } });
+  var showWarn = splitCountUsed && cat.items.length>1 && splitTotal !== dp.guests;
+
+  var itemsHtml = cat.items.map(function(item){ return renderItemRow(day, daypartKey, cat, item, dp); }).join("");
+
+  var suggestionType = cat.type;
+  var suggestList = SUGGESTIONS[suggestionType] || [];
+  var addSuggestHtml = suggestList.length ? suggestList.map(function(s, idx){
+    return '<div class="suggest-item">'+
+      '<div><div class="suggest-name">'+escapeHtml(s.name)+'</div><div class="suggest-desc">'+escapeHtml(s.desc)+'</div></div>'+
+      '<button class="btn small" data-action="add-suggestion" data-day="'+day.id+'" data-daypart="'+daypartKey+'" data-cat="'+cat.id+'" data-suggestion-type="'+suggestionType+'" data-suggestion-index="'+idx+'">Add</button>'+
+    '</div>';
+  }).join("") : '<div class="suggest-desc">No curated suggestions for this category yet — use "Add custom item".</div>';
+
+  return '<div class="category" data-cat="'+cat.id+'">'+
+    '<div class="category-head">'+
+      '<input type="text" data-action="cat-name" data-cat="'+cat.id+'" value="'+escapeHtml(cat.name)+'">'+
+      (showWarn ? '<span class="cat-warn">⚠ dish split ('+splitTotal+') ≠ guest count ('+dp.guests+') — planning only, price unaffected</span>' : '')+
+      '<button class="btn small ghost" data-action="cat-remove" data-cat="'+cat.id+'">Remove category</button>'+
+    '</div>'+
+    '<div class="items">'+itemsHtml+'</div>'+
+    '<div class="cat-actions">'+
+      '<details class="swapper"><summary>+ Add suggested item</summary><div class="popover">'+addSuggestHtml+'</div></details>'+
+      '<button class="btn small" data-action="cat-add-custom" data-day="'+day.id+'" data-daypart="'+daypartKey+'" data-cat="'+cat.id+'">+ Add custom item</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderItemRow(day, daypartKey, cat, item, dp){
+  var showSplit = cat.items.length > 1;
+  var suggestList = SUGGESTIONS[cat.type] || [];
+  var swapHtml = suggestList.length ? suggestList.map(function(s, idx){
+    var pill = s.upcharge>0 ? '<span class="pill pill-premium">+'+money(s.upcharge)+'/guest</span>' : '<span class="pill pill-free">Same cost</span>';
+    return '<div class="suggest-item">'+
+      '<div><div class="suggest-name">'+escapeHtml(s.name)+' '+pill+'</div><div class="suggest-desc">'+escapeHtml(s.desc)+'</div></div>'+
+      '<button class="btn small" data-action="swap" data-item="'+item.id+'" data-suggestion-type="'+cat.type+'" data-suggestion-index="'+idx+'">Use</button>'+
+    '</div>';
+  }).join("") : '<div class="suggest-desc">No curated suggestions for this category — edit the name/description directly.</div>';
+
+  var dayOptions = state.days.map(function(d){ return '<option value="'+d.id+'"'+(d.id===day.id?' selected':'')+'>'+escapeHtml(d.label.split(",")[0])+'</option>'; }).join("");
+  var daypartOptions = Object.keys(DAYPART_LABEL).map(function(k){ return '<option value="'+k+'"'+(k===daypartKey?' selected':'')+'>'+DAYPART_LABEL[k]+'</option>'; }).join("");
+  var catOptions = dp.categories.map(function(c){ return '<option value="'+c.id+'"'+(c.id===cat.id?' selected':'')+'>'+escapeHtml(c.name)+'</option>'; }).join("") + '<option value="__new__">+ New category…</option>';
+
+  return '<div class="item-row" data-item="'+item.id+'">'+
+    '<input type="text" data-action="item-name" data-item="'+item.id+'" value="'+escapeHtml(item.name)+'" placeholder="Dish name">'+
+    '<input type="text" data-action="item-desc" data-item="'+item.id+'" value="'+escapeHtml(item.desc)+'" placeholder="Description">'+
+    (showSplit ? '<div class="split-wrap">Guests on dish<input type="number" min="0" data-action="item-split" data-item="'+item.id+'" value="'+(item.splitCount!=null?item.splitCount:'')+'" placeholder="'+dp.guests+'"></div>' : '<div></div>')+
+    '<div class="up-wrap">Upcharge/guest<input type="number" min="0" step="0.25" data-action="item-upcharge" data-item="'+item.id+'" value="'+(item.upcharge||0)+'"></div>'+
+    '<details class="swapper"><summary>Swap</summary><div class="popover">'+swapHtml+'</div></details>'+
+    '<div class="row-actions">'+
+      '<details class="mover" data-item="'+item.id+'"><summary>Move</summary><div class="popover"><div class="mover-body">'+
+        '<label>Day<select data-role="day">'+dayOptions+'</select></label>'+
+        '<label>Meal<select data-role="daypart">'+daypartOptions+'</select></label>'+
+        '<label>Category<select data-role="category">'+catOptions+'</select></label>'+
+        '<input type="text" data-role="newcat" placeholder="New category name" style="display:none">'+
+        '<button class="btn small gold" data-action="move-confirm" data-item="'+item.id+'">Move Item</button>'+
+      '</div></div></details>'+
+      '<button class="btn small ghost" data-action="item-remove" data-item="'+item.id+'" title="Remove">✕</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderBar(day){
+  var total = day.bar.enabled ? day.bar.guests*PRICING.bar : 0;
+  return '<div class="daypart-card bar-card">'+
+    '<div class="daypart-head">'+
+      '<div><h3>Premium Hosted Bar</h3><div class="time">'+escapeHtml(day.bar.time)+'</div></div>'+
+      '<div class="daypart-total" id="bar-total-'+day.id+'">'+moneyRound(total)+'<small>'+money(PRICING.bar)+'/guest</small></div>'+
+    '</div>'+
+    '<div class="daypart-body">'+
+      '<label class="bar-toggle"><input type="checkbox" data-action="bar-toggle" data-day="'+day.id+'" '+(day.bar.enabled?'checked':'')+'> Hosted bar active this day</label>'+
+      '<div class="daypart-guests">Guests <input type="number" min="0" data-action="bar-guests" data-day="'+day.id+'" value="'+day.bar.guests+'"></div>'+
+      '<div class="bar-menu-list">Tito\'s Vodka, Tanqueray Gin, Bacardi &amp; Captain Morgan Rum, Buffalo Trace Bourbon, Jack Daniel\'s, Dewar\'s Scotch, Teremana Tequila, Amaretto/Triple Sec/Brandy, domestic &amp; craft beer, Canyon Road wines, full non-alcoholic support. 7:00 a.m.–7:00 p.m. daily.</div>'+
+    '</div>'+
+  '</div>';
+}
+
+/* =========================================================
+   RENDER — summary / print view
+========================================================= */
+function renderSummary(){
+  var el = document.getElementById("summaryView");
+  var t = computeProgram();
+
+  var overviewRows = state.days.map(function(day){
+    return '<tr><td>'+escapeHtml(day.label)+'</td>'+
+      '<td class="num">'+day.breakfast.guests+'</td>'+
+      '<td class="num">'+day.lunch.guests+'</td>'+
+      '<td class="num">'+day.reception.guests+'</td>'+
+      '<td class="num">'+(day.bar.enabled? day.bar.guests : "—")+'</td></tr>';
+  }).join("");
+
+  var investRows = state.days.map(function(day){
+    var c = t.perDay[day.id];
+    return '<tr><td>'+escapeHtml(day.label.split(",")[0])+'</td>'+
+      '<td class="num">'+moneyRound(c.food)+'</td>'+
+      '<td class="num">'+moneyRound(c.bar)+'</td>'+
+      '<td class="num">'+moneyRound(c.total)+'</td></tr>';
+  }).join("");
+
+  var dayBlocks = state.days.map(function(day){
+    return renderSummaryDay(day);
+  }).join("");
+
+  el.innerHTML =
+    '<h2>Program Overview</h2>'+
+    '<p><strong>BMW Executive Hospitality &amp; Culinary Program</strong> — August 20–23, 2026<br>'+
+    'Private Residence near Bellerive Country Club, St. Louis, Missouri<br>'+
+    'Prepared for ISM | Executive Hosting Advisory · Walnut Catering &amp; Events</p>'+
+    '<table class="sum-table"><thead><tr><th>Event Day</th><th class="num">Breakfast Guests</th><th class="num">Lunch Guests</th><th class="num">Reception Guests</th><th class="num">Bar Guests</th></tr></thead>'+
+    '<tbody>'+overviewRows+'</tbody></table>'+
+
+    '<h2>Culinary Program Investment (Flat Rate per Guest)</h2>'+
+    '<table class="sum-table"><thead><tr><th>Culinary Experience</th><th class="num">Price per Guest</th></tr></thead><tbody>'+
+    '<tr><td>Premium Breakfast Experience</td><td class="num">'+money(PRICING.breakfast)+'</td></tr>'+
+    '<tr><td>Executive Lunch Buffet</td><td class="num">'+money(PRICING.lunch)+'</td></tr>'+
+    '<tr><td>Evening Reception &amp; Chef-Carving Experience</td><td class="num">'+money(PRICING.reception)+'</td></tr>'+
+    '<tr><td>12-Hour Premium Hosted Bar</td><td class="num">'+money(PRICING.bar)+'</td></tr>'+
+    '</tbody></table>'+
+    '<p style="font-size:12px;color:var(--muted)">Individual dish swaps do not change the per-guest rate above. Any item explicitly marked with a premium upcharge is itemized separately in the totals below.</p>'+
+
+    '<h2>Adjusted Program Investment</h2>'+
+    '<table class="sum-table"><thead><tr><th>Event Day</th><th class="num">Food</th><th class="num">Bar</th><th class="num">Day Total</th></tr></thead>'+
+    '<tbody>'+investRows+
+    '<tr style="font-weight:700;background:#f6f7fa"><td>PROGRAM TOTAL ('+t.guestDays.toLocaleString()+' guest-days)</td>'+
+    '<td class="num">'+moneyRound(t.food)+'</td><td class="num">'+moneyRound(t.bar)+'</td><td class="num">'+moneyRound(t.total)+'</td></tr>'+
+    '</tbody></table>'+
+    '<p style="font-size:12px;color:var(--muted)">Professional staffing, rentals, logistics, applicable taxes, service charge, and other approved event expenses are addressed separately and are not included in the food and beverage estimate above.</p>'+
+
+    '<h2>Daily Menus</h2>'+
+    dayBlocks+
+
+    '<h2>Terms &amp; Conditions</h2>'+
+    '<div class="terms">'+
+      '<h3>Guest Guarantee</h3><p>Final guaranteed attendance is due fourteen (14) business days before the first event date. Final billing will be based upon the guaranteed attendance or actual attendance, whichever is greater.</p>'+
+      '<h3>Deposit &amp; Payment Schedule</h3><p>Proposed payment schedule: 25% upon acceptance; 25% thirty (30) days before the event; remaining estimated balance due based upon the final guarantee, with approved post-event adjustments invoiced separately.</p>'+
+      '<h3>Menu &amp; Scope Adjustments</h3><p>Menu selections and service details may be adjusted by mutual written agreement, as reflected in this planner. Pricing may be revised if substantial changes are made to guest counts, service times, menus, beverage selections, event infrastructure, or scope of service.</p>'+
+      '<h3>Venue &amp; Infrastructure</h3><p>Pricing assumes reasonable access to the event site and adequate utilities, staging, service, storage, and production areas. Additional equipment, labor, transportation, or infrastructure required following the site evaluation will be quoted separately.</p>'+
+      '<h3>Alcohol Service</h3><p>Walnut Catering &amp; Events reserves the right to refuse alcoholic beverage service to any guest who appears intoxicated or cannot provide acceptable proof of legal drinking age.</p>'+
+      '<h3>Taxes &amp; Service Charges</h3><p>Applicable sales taxes, service charges, administrative fees, and gratuities will be itemized in the final agreement.</p>'+
+    '</div>'+
+
+    '<h2>Proposal Acceptance</h2>'+
+    '<p>The undersigned acknowledges receipt of this adjusted proposal and authorizes Walnut Catering &amp; Events to proceed with detailed event planning subject to execution of the final catering agreement, approved scope of service, and required deposit.</p>'+
+    '<table class="sum-table"><tr><th>Accepted By</th><th>Walnut Catering &amp; Events</th></tr>'+
+    '<tr><td class="sig">Name: _____________________</td><td class="sig">Representative: _____________________</td></tr>'+
+    '<tr><td class="sig">Title: _____________________</td><td class="sig">Title: _____________________</td></tr>'+
+    '<tr><td class="sig">Signature: _____________________</td><td class="sig">Signature: _____________________</td></tr>'+
+    '<tr><td class="sig">Date: _____________________</td><td class="sig">Date: _____________________</td></tr>'+
+    '</table>';
+}
+
+function renderSummaryDay(day){
+  var c = computeDay(day);
+  function catsBlock(dp){
+    return dp.categories.map(function(cat){
+      var items = cat.items.map(function(it){
+        var extra = [];
+        if (it.desc) extra.push(it.desc);
+        if (it.upcharge>0) extra.push("+"+money(it.upcharge)+"/guest");
+        if (cat.items.length>1 && it.splitCount!=null && it.splitCount!=="") extra.push(it.splitCount+" guests");
+        return '<div class="sum-item"><strong>'+escapeHtml(it.name)+'</strong>'+(extra.length? ' <span class="d">— '+escapeHtml(extra.join(", "))+'</span>':'')+'</div>';
+      }).join("");
+      return '<div class="sum-cat"><h4>'+escapeHtml(cat.name)+'</h4>'+items+'</div>';
+    }).join("");
+  }
+  return '<div class="sum-day-block">'+
+    '<div class="sum-day-title">'+escapeHtml(day.label)+'</div>'+
+    '<div class="sum-day-body">'+
+      '<h4 style="color:var(--navy)">Breakfast — '+day.breakfast.guests+' guests ('+day.breakfast.time+') · '+moneyRound(c.bf)+'</h4>'+
+      catsBlock(day.breakfast)+
+      '<h4 style="color:var(--navy);margin-top:14px">Lunch — '+day.lunch.guests+' guests ('+day.lunch.time+') · '+moneyRound(c.lu)+'</h4>'+
+      catsBlock(day.lunch)+
+      '<h4 style="color:var(--navy);margin-top:14px">Evening Reception — '+day.reception.guests+' guests ('+day.reception.time+') · '+moneyRound(c.re)+'</h4>'+
+      catsBlock(day.reception)+
+      (day.bar.enabled ? '<h4 style="color:var(--navy);margin-top:14px">Hosted Bar — '+day.bar.guests+' guests · '+moneyRound(c.bar)+'</h4>' : '')+
+    '</div>'+
+  '</div>';
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+function switchTab(tab){
+  activeTab = tab;
+  document.querySelectorAll(".tab").forEach(function(b){ b.classList.toggle("active", b.dataset.tab===tab); });
+  document.getElementById("planView").classList.toggle("hidden", tab!=="plan");
+  document.getElementById("summaryView").classList.toggle("hidden", tab!=="summary");
+  if (tab==="summary") renderSummary();
+}
+function switchDay(dayId){
+  activeDay = dayId;
+  renderDayTabs();
+  renderDayContent();
+}
+function updateDaypartGuests(dayId, daypartKey, value){
+  var day = getDay(dayId);
+  day[daypartKey].guests = Math.max(0, Number(value)||0);
+  saveState();
+  var t = computeProgram();
+  var el = document.getElementById("dp-total-"+dayId+"-"+daypartKey);
+  if (el) el.innerHTML = moneyRound(t.perDay[dayId][daypartKey==="breakfast"?"bf":daypartKey==="lunch"?"lu":"re"]) + "<small>"+money(PRICING[daypartKey])+"/guest</small>";
+  renderTotals();
+}
+function updateBarGuests(dayId, value){
+  var day = getDay(dayId);
+  day.bar.guests = Math.max(0, Number(value)||0);
+  saveState();
+  var t = computeProgram();
+  var el = document.getElementById("bar-total-"+dayId);
+  if (el) el.innerHTML = moneyRound(t.perDay[dayId].bar) + "<small>"+money(PRICING.bar)+"/guest</small>";
+  renderTotals();
+}
+function toggleBar(dayId, checked){
+  var day = getDay(dayId);
+  day.bar.enabled = checked;
+  saveState();
+  renderDayContent();
+  renderTotals();
+}
+function applyDayToAll(dayId){
+  var day = getDay(dayId);
+  var v = Number(document.getElementById("quickGuests_"+dayId).value)||0;
+  day.guests = v;
+  day.breakfast.guests = v; day.lunch.guests = v; day.reception.guests = v; day.bar.guests = v;
+  saveState();
+  renderDayContent();
+  renderTotals();
+}
+function updateItemField(itemId, field, value){
+  var loc = findItemLocation(itemId);
+  if (!loc) return;
+  if (field==="upcharge" || field==="splitCount"){
+    loc.item[field] = value===""? (field==="splitCount"?null:0) : Number(value);
+  } else {
+    loc.item[field] = value;
+  }
+  saveState();
+  if (field==="upcharge" || field==="splitCount"){
+    var t = computeProgram();
+    var key = loc.daypartKey==="breakfast"?"bf":loc.daypartKey==="lunch"?"lu":"re";
+    var el = document.getElementById("dp-total-"+loc.day.id+"-"+loc.daypartKey);
+    if (el) el.innerHTML = moneyRound(t.perDay[loc.day.id][key]) + "<small>"+money(PRICING[loc.daypartKey])+"/guest"+(upchargeTotal(loc.daypart)>0?' + '+money(upchargeTotal(loc.daypart))+' premium':'')+"</small>";
+    renderTotals();
+    if (field==="splitCount"){
+      // refresh warning label without full rerender to preserve focus
+      var catEl = document.querySelector('.category[data-cat="'+loc.category.id+'"] .category-head');
+      if (catEl){
+        var warn = catEl.querySelector(".cat-warn");
+        var splitTotal = 0, used=false;
+        loc.category.items.forEach(function(it){ if (it.splitCount!=null && it.splitCount!==""){ splitTotal+=Number(it.splitCount); used=true; } });
+        var shouldWarn = used && loc.category.items.length>1 && splitTotal!==loc.daypart.guests;
+        if (shouldWarn && !warn){
+          var span = document.createElement("span");
+          span.className="cat-warn";
+          span.textContent = "⚠ dish split ("+splitTotal+") ≠ guest count ("+loc.daypart.guests+") — planning only, price unaffected";
+          catEl.insertBefore(span, catEl.lastElementChild);
+        } else if (shouldWarn && warn){
+          warn.textContent = "⚠ dish split ("+splitTotal+") ≠ guest count ("+loc.daypart.guests+") — planning only, price unaffected";
+        } else if (!shouldWarn && warn){
+          warn.remove();
+        }
+      }
+    }
+  }
+}
+function swapItem(itemId, suggestionType, idx){
+  var loc = findItemLocation(itemId);
+  if (!loc) return;
+  var s = (SUGGESTIONS[suggestionType]||[])[idx];
+  if (!s) return;
+  loc.item.name = s.name;
+  loc.item.desc = s.desc || "";
+  loc.item.upcharge = s.upcharge || 0;
+  saveState();
+  renderDayContent();
+  renderTotals();
+}
+function addSuggestionItem(dayId, daypartKey, catId, suggestionType, idx){
+  var cat = findCategory(dayId, daypartKey, catId);
+  if (!cat) return;
+  var s = (SUGGESTIONS[suggestionType]||[])[idx];
+  if (!s) return;
+  cat.items.push(mkItem(s.name, s.desc, s.upcharge));
+  saveState();
+  renderDayContent();
+  renderTotals();
+}
+function addCustomItem(dayId, daypartKey, catId){
+  var cat = findCategory(dayId, daypartKey, catId);
+  if (!cat) return;
+  cat.items.push(mkItem("New Item", "", 0));
+  saveState();
+  renderDayContent();
+}
+function removeItem(itemId){
+  var loc = findItemLocation(itemId);
+  if (!loc) return;
+  if (!confirm('Remove "'+loc.item.name+'" from the menu?')) return;
+  loc.category.items.splice(loc.itemIndex, 1);
+  saveState();
+  renderDayContent();
+  renderTotals();
+}
+function addCategory(dayId, daypartKey){
+  var day = getDay(dayId);
+  var dp = day[daypartKey];
+  dp.categories.push(mkCategory("custom", "New Category", "custom", []));
+  saveState();
+  renderDayContent();
+}
+function removeCategory(catId){
+  for (var d=0; d<state.days.length; d++){
+    var day = state.days[d];
+    var keys = ["breakfast","lunch","reception"];
+    for (var k=0;k<keys.length;k++){
+      var dp = day[keys[k]];
+      for (var i=0;i<dp.categories.length;i++){
+        if (dp.categories[i].id===catId){
+          if (!confirm('Remove category "'+dp.categories[i].name+'" and all its items?')) return;
+          dp.categories.splice(i,1);
+          saveState();
+          renderDayContent();
+          renderTotals();
+          return;
+        }
+      }
+    }
+  }
+}
+function moveItem(itemId, destDayId, destDaypartKey, destCatValue, newCatName){
+  var loc = findItemLocation(itemId);
+  if (!loc) return;
+  var destDay = getDay(destDayId);
+  var destDp = destDay[destDaypartKey];
+  var destCat;
+  if (destCatValue==="__new__" || (newCatName && newCatName.trim())){
+    destCat = mkCategory("custom", (newCatName&&newCatName.trim()) ? newCatName.trim() : "New Category", "custom", []);
+    destDp.categories.push(destCat);
+  } else {
+    destCat = destDp.categories.filter(function(c){ return c.id===destCatValue; })[0];
+    if (!destCat){
+      destCat = mkCategory("custom", "Additional Items", "custom", []);
+      destDp.categories.push(destCat);
+    }
+  }
+  // reset split count since guest pool context changed
+  loc.item.splitCount = null;
+  loc.category.items.splice(loc.itemIndex, 1);
+  destCat.items.push(loc.item);
+  saveState();
+  renderDayContent();
+  renderTotals();
+}
+
+/* =========================================================
+   EVENT DELEGATION
+========================================================= */
+document.addEventListener("click", function(e){
+  var t = e.target.closest("[data-action]");
+  if (!t) return;
+  var action = t.dataset.action;
+
+  if (action==="switch-tab"){ switchTab(t.dataset.tab); }
+  else if (action==="switch-day"){ switchDay(t.dataset.day); }
+  else if (action==="reset"){ resetState(); }
+  else if (action==="print"){ window.print(); }
+  else if (action==="submit-open"){ submitOpen(); }
+  else if (action==="submit-cancel"){ submitCancel(); }
+  else if (action==="submit-send"){ submitSend(); }
+  else if (action==="submit-fallback-email"){ submitFallbackEmail(); }
+  else if (action==="submit-fallback-copy"){ submitFallbackCopy(); }
+  else if (action==="day-apply-all"){ applyDayToAll(t.dataset.day); }
+  else if (action==="item-remove"){ removeItem(t.dataset.item); }
+  else if (action==="cat-remove"){ removeCategory(t.dataset.cat); }
+  else if (action==="cat-add-custom"){ addCustomItem(t.dataset.day, t.dataset.daypart, t.dataset.cat); }
+  else if (action==="add-category"){ addCategory(t.dataset.day, t.dataset.daypart); }
+  else if (action==="add-suggestion"){
+    addSuggestionItem(t.dataset.day, t.dataset.daypart, t.dataset.cat, t.dataset.suggestionType, Number(t.dataset.suggestionIndex));
+    var details = t.closest("details"); if (details) details.open=false;
+  }
+  else if (action==="swap"){
+    swapItem(t.dataset.item, t.dataset.suggestionType, Number(t.dataset.suggestionIndex));
+  }
+  else if (action==="move-confirm"){
+    var details = t.closest("details.mover");
+    var daySel = details.querySelector('select[data-role="day"]');
+    var dpSel = details.querySelector('select[data-role="daypart"]');
+    var catSel = details.querySelector('select[data-role="category"]');
+    var newCat = details.querySelector('input[data-role="newcat"]');
+    moveItem(t.dataset.item, daySel.value, dpSel.value, catSel.value, newCat.value);
+    details.open = false;
+  }
+});
+
+document.addEventListener("change", function(e){
+  var t = e.target;
+  var action = t.dataset.action;
+
+  if (action==="daypart-guests"){ updateDaypartGuests(t.dataset.day, t.dataset.daypart, t.value); }
+  else if (action==="bar-guests"){ updateBarGuests(t.dataset.day, t.value); }
+  else if (action==="bar-toggle"){ toggleBar(t.dataset.day, t.checked); }
+  else if (action==="item-split"){ updateItemField(t.dataset.item, "splitCount", t.value); }
+  else if (action==="item-upcharge"){ updateItemField(t.dataset.item, "upcharge", t.value); }
+  else if (t.dataset.role==="category"){
+    var details = t.closest("details.mover");
+    var newCat = details.querySelector('input[data-role="newcat"]');
+    newCat.style.display = (t.value==="__new__") ? "block" : "none";
+  }
+  else if (t.dataset.role==="day" || t.dataset.role==="daypart"){
+    var det = t.closest("details.mover");
+    var dayVal = det.querySelector('select[data-role="day"]').value;
+    var dpVal = det.querySelector('select[data-role="daypart"]').value;
+    var day = getDay(dayVal);
+    var dp = day[dpVal];
+    var catSel = det.querySelector('select[data-role="category"]');
+    catSel.innerHTML = dp.categories.map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.name)+'</option>'; }).join("") + '<option value="__new__">+ New category…</option>';
+    det.querySelector('input[data-role="newcat"]').style.display = "none";
+  }
+});
+
+document.addEventListener("input", function(e){
+  var t = e.target;
+  var action = t.dataset.action;
+  if (action==="item-name"){ updateItemField(t.dataset.item, "name", t.value); }
+  else if (action==="item-desc"){ updateItemField(t.dataset.item, "desc", t.value); }
+  else if (action==="cat-name"){
+    for (var d=0; d<state.days.length; d++){
+      var day = state.days[d];
+      ["breakfast","lunch","reception"].forEach(function(k){
+        day[k].categories.forEach(function(c){ if (c.id===t.dataset.cat) c.name = t.value; });
+      });
+    }
+    saveState();
+  }
+});
+
+// close any open popovers when clicking elsewhere
+document.addEventListener("click", function(e){
+  document.querySelectorAll("details[open]").forEach(function(d){
+    if (!d.contains(e.target)) d.open = false;
+  });
+});
+
+window.addEventListener("beforeprint", function(){ lastTabBeforePrint = activeTab; switchTab("summary"); });
+window.addEventListener("afterprint", function(){ switchTab(lastTabBeforePrint); });
+
+document.getElementById("submitOverlay").addEventListener("click", function(e){
+  if (e.target.id === "submitOverlay") submitCancel();
+});
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape" && !document.getElementById("submitOverlay").classList.contains("hidden")) submitCancel();
+});
+
+/* =========================================================
+   INIT
+========================================================= */
+state = loadState();
+renderAll();
+switchTab("plan");
+
+})();
+</script>
+</body>
+</html>
