@@ -8,6 +8,7 @@ export interface CaseStudyDefinition {
   title: string;
   subtitle: string;
   business: string;
+  publishedAt: string;
   summary: string;
   challenge: {
     heading: string;
@@ -31,6 +32,7 @@ export const caseStudies: CaseStudyDefinition[] = [
     title: "Replacing a one-person spreadsheet with the Catering Estimator",
     subtitle: "How a working catering operation moved off ad hoc pricing without slowing down a single event.",
     business: "An independent full-service restaurant and catering operation",
+    publishedAt: "2026-05-18",
     summary:
       "Inside the same restaurant and catering operation Kirk Ahlquist works in, catering pricing moved from a single person's spreadsheet to the Catering Estimator — built and refined against real events, not a demo menu.",
     challenge: {

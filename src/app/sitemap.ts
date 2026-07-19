@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { apps } from "@/lib/apps";
 import { caseStudies } from "@/lib/caseStudies";
+import { labEntries } from "@/lib/lab";
 import { site } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -8,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${site.url}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${site.url}/apps`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${site.url}/case-studies`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${site.url}/lab`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${site.url}/about`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${site.url}/contact`, changeFrequency: "monthly", priority: 0.6 },
   ];
@@ -24,5 +26,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...appRoutes, ...caseStudyRoutes];
+  const labRoutes: MetadataRoute.Sitemap = labEntries.map((entry) => ({
+    url: `${site.url}/lab/${entry.slug}`,
+    changeFrequency: "yearly",
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...appRoutes, ...caseStudyRoutes, ...labRoutes];
 }

@@ -127,6 +127,7 @@ export const apps: AppDefinition[] = [
     },
     mockup: "estimator",
     relatedCaseStudySlugs: ["catering-estimator-rollout"],
+    relatedLabSlugs: ["building-the-catering-estimator"],
   },
   {
     slug: "beo-builder",
@@ -200,6 +201,7 @@ export const apps: AppDefinition[] = [
       href: site.bookingUrl,
     },
     mockup: "beo",
+    relatedLabSlugs: ["replacing-paper-beos-with-an-ai-assisted-beo-builder"],
   },
   {
     slug: "labor-efficiency-calculator",
@@ -401,6 +403,7 @@ export const apps: AppDefinition[] = [
       href: site.bookingUrl,
     },
     mockup: "voice",
+    relatedLabSlugs: ["what-a-voice-ai-receptionist-actually-handles"],
   },
   {
     slug: "google-business-profile-analyzer",

@@ -57,6 +57,7 @@ const organizationSchema = {
   founder: {
     "@type": "Person",
     name: site.founder,
+    url: `${site.url}/about`,
   },
   description: site.description,
   email: site.email,

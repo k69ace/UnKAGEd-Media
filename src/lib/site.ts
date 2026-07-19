@@ -18,11 +18,11 @@ export type NavItem = {
   href: string;
 };
 
-// The Lab is added once it ships content (Phase 3).
 export const primaryNav: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Apps", href: "/apps" },
   { label: "Case Studies", href: "/case-studies" },
+  { label: "The Lab", href: "/lab" },
   { label: "About Kirk", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];

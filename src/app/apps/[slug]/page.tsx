@@ -10,6 +10,7 @@ import { Faq } from "@/components/Faq";
 import { JsonLd } from "@/components/JsonLd";
 import { apps, getAppBySlug } from "@/lib/apps";
 import { getCaseStudyBySlug } from "@/lib/caseStudies";
+import { getLabEntriesForApp } from "@/lib/lab";
 import { site } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -56,6 +57,8 @@ export default async function AppPage({
     .map((csSlug) => getCaseStudyBySlug(csSlug))
     .filter((cs): cs is NonNullable<typeof cs> => Boolean(cs));
 
+  const relatedLabEntries = getLabEntriesForApp(app.slug);
+
   const softwareSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -67,6 +70,7 @@ export default async function AppPage({
     creator: {
       "@type": "Person",
       name: site.founder,
+      url: `${site.url}/about`,
     },
     publisher: {
       "@type": "Organization",
@@ -203,11 +207,11 @@ export default async function AppPage({
         ctaHref={app.cta.href}
       />
 
-      {relatedCaseStudies.length > 0 && (
+      {(relatedCaseStudies.length > 0 || relatedLabEntries.length > 0) && (
         <section className="border-b border-border">
           <Container className="py-16 sm:py-20">
             <h2 className="text-xl font-semibold tracking-tight text-foreground">
-              Case study
+              From the Lab and case studies
             </h2>
             <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
               {relatedCaseStudies.map((cs) => (
@@ -216,11 +220,25 @@ export default async function AppPage({
                   href={`/case-studies/${cs.slug}`}
                   className="group rounded-2xl border border-border bg-background-elevated p-6 transition-colors hover:border-accent"
                 >
-                  <span className="text-xs font-medium text-muted">{cs.business}</span>
+                  <span className="text-xs font-medium text-muted">Case study &middot; {cs.business}</span>
                   <h3 className="mt-3 text-base font-semibold text-foreground">{cs.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted">{cs.subtitle}</p>
                   <span className="mt-4 inline-block text-sm font-semibold text-accent-strong group-hover:text-accent">
                     Read the case study &rarr;
+                  </span>
+                </Link>
+              ))}
+              {relatedLabEntries.map((entry) => (
+                <Link
+                  key={entry.slug}
+                  href={`/lab/${entry.slug}`}
+                  className="group rounded-2xl border border-border bg-background-elevated p-6 transition-colors hover:border-accent"
+                >
+                  <span className="text-xs font-medium text-muted">From the Lab</span>
+                  <h3 className="mt-3 text-base font-semibold text-foreground">{entry.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">{entry.dek}</p>
+                  <span className="mt-4 inline-block text-sm font-semibold text-accent-strong group-hover:text-accent">
+                    Read the entry &rarr;
                   </span>
                 </Link>
               ))}
