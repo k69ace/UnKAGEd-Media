@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Container } from "@/components/Container";
-import { primaryNav, site } from "@/lib/site";
+import { LogoMark, Logotype } from "@/components/Logo";
+import { primaryNav } from "@/lib/site";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -18,8 +19,8 @@ export function Header() {
           className="flex items-center gap-2 text-base font-semibold tracking-tight text-foreground sm:text-lg"
           onClick={() => setOpen(false)}
         >
-          <span className="inline-block h-2 w-2 rounded-full bg-accent" aria-hidden />
-          {site.name}
+          <LogoMark size={10} />
+          <Logotype />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

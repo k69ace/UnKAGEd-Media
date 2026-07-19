@@ -44,7 +44,7 @@ export default function HomePage() {
           className="pointer-events-none absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(60% 50% at 50% 0%, rgba(59,130,246,0.16) 0%, rgba(5,7,12,0) 70%)",
+              "radial-gradient(60% 50% at 50% 0%, rgba(30,144,243,0.2) 0%, rgba(45,47,53,0) 70%)",
           }}
           aria-hidden
         />

@@ -82,7 +82,7 @@ export default function AboutPage() {
               className="flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border border-border-strong text-3xl font-semibold text-accent-strong"
               style={{
                 background:
-                  "radial-gradient(120% 120% at 20% 20%, rgba(59,130,246,0.25) 0%, rgba(11,15,25,1) 70%)",
+                  "radial-gradient(120% 120% at 20% 20%, rgba(96,200,255,0.3) 0%, rgba(45,47,53,1) 70%)",
               }}
               aria-hidden
             >

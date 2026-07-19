@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/Container";
+import { LogoMark, Logotype } from "@/components/Logo";
 import { footerNav, site } from "@/lib/site";
 
 export function Footer() {
@@ -10,8 +11,8 @@ export function Footer() {
       <Container className="flex flex-col gap-8 py-12 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-sm">
           <Link href="/" className="flex items-center gap-2 text-base font-semibold text-foreground">
-            <span className="inline-block h-2 w-2 rounded-full bg-accent" aria-hidden />
-            {site.name}
+            <LogoMark size={10} />
+            <Logotype />
           </Link>
           <p className="mt-3 text-sm leading-relaxed text-muted">
             AI-powered business systems for restaurants, bars, and catering
