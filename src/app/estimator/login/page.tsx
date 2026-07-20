@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { signIn, signUp, type AuthActionState } from "./actions";
 
-const initialState: AuthActionState = { error: null };
+const initialState: AuthActionState = { error: null, message: null };
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
@@ -48,6 +48,7 @@ export default function LoginPage() {
           <Field label="Email" name="email" type="email" autoComplete="email" required />
           <Field label="Password" name="password" type="password" autoComplete="new-password" required minLength={8} />
           {signUpState.error && <ErrorText>{signUpState.error}</ErrorText>}
+          {signUpState.message && <InfoText>{signUpState.message}</InfoText>}
           <SubmitButton pending={signUpPending}>Create organization</SubmitButton>
         </form>
       )}
@@ -87,6 +88,10 @@ function Field({
 
 function ErrorText({ children }: { children: string }) {
   return <p className="text-sm text-red-500" role="alert">{children}</p>;
+}
+
+function InfoText({ children }: { children: string }) {
+  return <p className="text-sm text-foreground/70" role="status">{children}</p>;
 }
 
 function SubmitButton({ pending, children }: { pending: boolean; children: string }) {
