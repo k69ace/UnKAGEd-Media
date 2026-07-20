@@ -66,6 +66,17 @@ export async function listContactsForCustomer(customerId: string) {
   return data;
 }
 
+export async function listAllTaxRules(organizationId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("tax_rules")
+    .select("id, name, rate, is_active")
+    .eq("organization_id", organizationId)
+    .order("name");
+  if (error) throw error;
+  return data;
+}
+
 export async function listOrgConfig(organizationId: string) {
   const supabase = await createClient();
   const [taxRules, eventTypes, serviceStyles, staffingRoles, settings, packageTemplates] = await Promise.all([
