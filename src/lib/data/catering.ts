@@ -31,7 +31,7 @@ export type PipelineEstimateRow = Pick<
 > & {
   customers: { name: string; company_name: string | null } | null;
   event_types: { name: string } | null;
-  catering_estimate_line_items: Pick<LineItemRow, "quantity" | "unit_price">[];
+  catering_estimate_line_items: Pick<LineItemRow, "id" | "category" | "quantity" | "unit_price" | "unit_cost" | "is_taxable" | "tax_rule_id">[];
 };
 
 export async function listCustomers(organizationId: string) {
@@ -144,6 +144,8 @@ export interface PipelineFilters {
   eventTypeId?: string;
   dateFrom?: string;
   dateTo?: string;
+  guestCountMin?: number;
+  guestCountMax?: number;
 }
 
 export async function listEstimatesForPipeline(organizationId: string, filters: PipelineFilters = {}): Promise<PipelineEstimateRow[]> {
@@ -154,7 +156,7 @@ export async function listEstimatesForPipeline(organizationId: string, filters: 
       `id, status, event_date, guest_count_estimated, guest_count_guaranteed, discount_amount, created_at, version, previous_version_id,
       customers(name, company_name),
       event_types(name),
-      catering_estimate_line_items(quantity, unit_price)`,
+      catering_estimate_line_items(id, category, quantity, unit_price, unit_cost, is_taxable, tax_rule_id)`,
     )
     .eq("organization_id", organizationId)
     .order("created_at", { ascending: false });
@@ -163,6 +165,8 @@ export async function listEstimatesForPipeline(organizationId: string, filters: 
   if (filters.eventTypeId) query = query.eq("event_type_id", filters.eventTypeId);
   if (filters.dateFrom) query = query.gte("event_date", filters.dateFrom);
   if (filters.dateTo) query = query.lte("event_date", filters.dateTo);
+  if (filters.guestCountMin != null) query = query.gte("guest_count_estimated", filters.guestCountMin);
+  if (filters.guestCountMax != null) query = query.lte("guest_count_estimated", filters.guestCountMax);
 
   const { data, error } = await query;
   if (error) throw error;

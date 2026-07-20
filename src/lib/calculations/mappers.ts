@@ -6,7 +6,9 @@ type StaffingRow = Database["public"]["Tables"]["catering_estimate_staffing"]["R
 type OrgSettingsRow = Database["public"]["Tables"]["organization_settings"]["Row"];
 type TaxRuleRow = Database["public"]["Tables"]["tax_rules"]["Row"];
 
-export function toCalcLineItem(row: LineItemRow): LineItem {
+export function toCalcLineItem(
+  row: Pick<LineItemRow, "id" | "category" | "quantity" | "unit_price" | "unit_cost" | "is_taxable" | "tax_rule_id">,
+): LineItem {
   return {
     id: row.id,
     category: row.category,
