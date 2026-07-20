@@ -1,0 +1,186 @@
+# Catering Estimator — Completion Report
+
+Branch: `claude/catering-estimator-aun3r6`. Built in the staged order the
+assignment specified: audit → data model → calculations + tests → estimate
+builder workflow → pipeline/reporting → exports → AI suggestions →
+settings/seed/docs.
+
+## What shipped
+
+- **Repository audit** (`AUDIT_CATERING.md`) — the repo was a pure static
+  marketing site with zero backend; "Catering Estimator" existed only as a
+  product marketing page. Classified Not Started. Also flagged, then
+  corrected, a real finding: the repo's `AGENTS.md` warns of Next.js
+  breaking changes and points at `node_modules/next/dist/docs/` — that path
+  didn't exist at audit time (no `node_modules`), so I initially treated it
+  as an unverifiable/injection-like claim. Once dependencies were
+  installed, the docs *were* real and the claim was true: Next.js 16
+  deprecated `middleware.ts` in favor of `proxy.ts`. Migrated accordingly.
+  Both the initial skepticism and the later correction are recorded in the
+  audit file.
+- **Data model** — 6 migrations (`supabase/migrations/`), applied to a
+  dedicated Supabase project (`unkaged-catering-estimator`): organizations/
+  locations/profiles/roles, customers/contacts, tax rules + org settings +
+  event types/service styles/staffing roles, package templates, the
+  estimate/line-item/staffing/guest-count-history tables, and an
+  append-only audit log written only by `SECURITY DEFINER` triggers (not
+  application code). Every table has Row Level Security with
+  organization-scoped policies. Schema state was independently verified via
+  a `pg_tables`/`pg_policies` query run through the Supabase SQL Editor
+  (17/17 tables, RLS on, expected policy counts).
+- **Calculation engine** (`src/lib/calculations/catering.ts`) — pure
+  functions, no I/O: per-line totals, discount validation (rejects
+  discount > subtotal instead of silently clamping), per-category tax
+  (never one blanket rate), independently-configurable-and-taxable service
+  charge and gratuity, per-person price, internal cost, contribution
+  margin. 29 tests including one fully worked realistic estimate and
+  explicit incomplete-data/zero-division cases.
+- **Estimate Builder** — create (existing or new customer), all eight
+  spec'd sections (Event Details, Menu/Packages, Beverages & Alcohol,
+  Rentals & Logistics, Staffing, Fees & Discounts, Payment Schedule,
+  Review & Send — Notes and Suggestions added alongside), autosave on
+  blur with a visible Saving/Saved/error indicator, a persistent totals
+  sidebar showing customer-facing pricing next to internal cost/margin,
+  server-side Send validation, and approval-threshold enforcement
+  (Manager/Owner-only above the org's $ threshold or below its margin
+  target). Editing an approved/won/lost/cancelled estimate clones it into
+  a new draft version and preserves the original — an explicit "Edit (new
+  version)" action, not a silent side effect.
+- **Pipeline Board** — status columns, KPI cards (open pipeline value, win
+  rate, average deal size, approved events in the next 7 days), filters
+  (event type/date range/guest count) as linkable query params, dropdown
+  status control (accessible fallback; no drag-and-drop — see Known
+  Limitations).
+- **Exports** — customer proposal PDF (itemized, payment schedule,
+  signature/date fields, zero internal data by construction — no prop
+  exists on the component for cost/margin/internal notes), internal
+  estimate PDF (cost + margin, banner-marked INTERNAL USE ONLY), internal
+  CSV, and pipeline CSV (status/value/cost/margin/owner across the active
+  filters). CSV cells are formula-injection-safe (leading `=+-@`).
+- **AI suggestions** — a rules-based engine is the actual primary
+  implementation (missing bar package for evening receptions, missing
+  staffing over 50 guests, a passed-hors-d'oeuvres upsell for large plated
+  dinners, no menu items yet). A real AI provider adapter exists as a typed
+  seam (`lib/suggestions/ai.ts`) that always returns `null` today — no
+  credentials or documented provider contract exist for this project, and
+  per the module's own integration policy nothing gets built against a
+  service without both. Every suggestion is labeled "Suggestion" in the UI
+  and nothing is ever auto-inserted onto an estimate.
+- **Settings** — tax rules (add/activate/deactivate), service charge and
+  gratuity (type/value/base/taxability, independently), approval threshold
+  and margin gate, default profit target. Role-gated to
+  catering_admin/manager_owner.
+- **Seed data** (`supabase/seed.sql`) — one fully realistic demo event (a
+  150-guest plated wedding spanning every line-item category, staffing, a
+  discount, deposit, won status) plus a demo customer/contact/package
+  template, all `[DEMO]`-prefixed.
+- **Docs** — this file, `CATERING_ESTIMATOR.md` (module README/
+  architecture), `docs/catering-estimator/user-guide.md` (sales staff),
+  `docs/catering-estimator/admin-guide.md` (tax/fee config), updated
+  `.env.example`, updated root `README.md`.
+
+## Verification performed
+
+- `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm test`
+  (51 tests) all clean as of the final commit on this branch.
+- Schema/RLS verified live against the Supabase project via SQL Editor
+  queries (not just "the migration ran without an error").
+- A real browser smoke test against the dev server (Playwright) caught and
+  fixed an actual bug: sign-up was redirecting to the pipeline even when
+  Supabase's email-confirmation requirement left no session, silently
+  bouncing the user back to a blank login form. Now shows a clear "check
+  your email" message.
+- PDF export is tested by actually rendering both documents from fixture
+  data and asserting real PDF output (magic bytes) — and specifically
+  asserting that `internal_notes` and any internal-notes section heading
+  never appear anywhere in the customer proposal's raw bytes, compressed
+  or not. This is the automated form of "no internal cost/margin data on a
+  customer-facing export," not just a claim.
+
+## What could not be verified in this environment
+
+This sandbox's network egress policy blocks the dev server's own outbound
+HTTPS to `*.supabase.co` (confirmed via the proxy's own diagnostics — a
+403 on the CONNECT tunnel to Supabase, distinct from the Supabase MCP
+tool's separate, also-troubled connection — see below). That means the
+full authenticated browser flow (sign in → build → send → approve → won,
+role switching, pipeline drag/dropdown, PDF download in a real browser)
+could not be exercised end-to-end from inside this session after the
+initial smoke test above. This is a constraint of the build environment,
+not of the deployed application — it will work normally on a real host
+(Vercel, the developer's own machine, etc.) where that restriction doesn't
+apply. **Recommend a full manual pass through the user guide's workflow
+before considering this production-ready.**
+
+Separately, Supabase MCP tool calls were intermittently gated behind a
+stuck "requires approval" state for a significant portion of the session
+(unrelated to the network-policy issue above — this affected the *tool*,
+not the app). Migrations 001–004 applied cleanly before it first stuck;
+005–006 were eventually applied by the user directly via the Supabase SQL
+Editor after I provided the exact SQL, and `generate_typescript_types`
+was never reachable, hence the hand-written types documented above.
+
+## Known Limitations
+
+- **No drag-and-drop** for line-item reordering or pipeline status
+  changes — up/down arrows and a dropdown are the (fully accessible)
+  implementation. Spec allowed this ("accessible... non-drag fallback");
+  drag-and-drop itself is a follow-up, not shipped.
+- **Payment schedule is deposit + due date only**, not a full multi-
+  installment schedule — `payment_schedule_json` exists in the schema for
+  this but has no editor UI yet.
+- **No in-app role management or teammate invite flow.** New sign-ups
+  always create a new organization as `sales_manager`. Changing a role or
+  merging a second sign-up into an existing organization requires editing
+  the `profiles` table directly (documented in the admin guide).
+- **No CRUD UI for event types, service styles, staffing roles, or package
+  templates.** They ship with sensible per-organization defaults (seeded
+  by a database trigger) and are editable via the Supabase Table Editor,
+  not the app.
+- **`chef_review_required` is an unenforced database field.** No
+  feasibility-review workflow step gates Send or Approve today.
+- **No CSV import for menu/pricing catalogs**, despite being listed under
+  MVP integrations scope — export exists, import doesn't.
+- **Customer proposal PDF is always itemized**, not configurable to a
+  package-summary view (spec allowed either, configurable per org).
+- **Guest-count change history is recorded** (every change, by whom, when
+  — a database trigger) **but has no UI to view it.** The data exists for
+  a future billing-dispute audit view.
+- **No diff view between estimate versions** — the version-history
+  breadcrumb links to each version's full page, not a side-by-side diff.
+- **Pipeline filters** don't include location or sales-owner, only event
+  type/date range/guest count — reasonable for a single-location org, a
+  real gap for multi-location/multi-rep ones.
+- **No in-app audit-log viewer** — `audit_log` is populated correctly but
+  only queryable via the database directly.
+- **Test coverage gap vs. the spec's Testing section**: unit tests exist
+  for calculations, DB-row mapping, CSV safety, PDF generation, and the
+  suggestions rules engine (51 tests). Not built: integration tests for
+  the full create→send→approve→won workflow, permission tests per role,
+  responsive UI tests, empty/failure-state tests, and CSV *import*
+  validation tests (there's no import feature to test). This tracks
+  directly from the environment constraint above — these are exactly the
+  tests that need a real browser against a real signed-in session.
+- **No e-signature** — the PDF has a blank "approved by (print name)" /
+  date line, matching the spec's stated MVP acceptance.
+
+## Future Roadmap (per spec)
+
+- Tripleseat / Caterease sync, e-signature, GoHighLevel lead capture — the
+  adapter contracts for these live in `src/lib/integrations/catering/`
+  with **no registered implementations**, so they can be added without
+  touching core estimate logic when real credentials/API docs exist.
+- A real AI suggestions provider, behind the existing `ai.ts` seam.
+- The CRUD UIs and workflow pieces listed under Known Limitations above.
+
+## Definition of Done — status
+
+| Requirement | Status |
+|---|---|
+| Sales manager can build a complete, tax-correct estimate and generate a customer-ready PDF in one sitting | Built and unit/PDF-tested; not live-browser-verified in this environment (see above) |
+| Per-category tax and configurable service charge/gratuity, tested for non-uniform taxability | Done — tested |
+| Version history preserved for post-approval edits | Done |
+| No internal cost/margin data on a customer-facing export | Done — tested |
+| Role-based access and approval-threshold logic enforced server-side | Done (`assertRole` + RLS) |
+| All calculation tests pass; no floating-point currency bugs | Done — 51/51 passing, epsilon-corrected rounding |
+| `AUDIT_CATERING.md` and this report committed and accurate | Done |
