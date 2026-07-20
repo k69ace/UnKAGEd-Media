@@ -20,7 +20,7 @@ export function toCalcLineItem(
   };
 }
 
-export function toCalcStaffing(row: StaffingRow): StaffingLine {
+export function toCalcStaffing(row: Pick<StaffingRow, "quantity" | "hours" | "rate_per_hour">): StaffingLine {
   return { quantity: row.quantity, hours: row.hours, ratePerHour: row.rate_per_hour };
 }
 

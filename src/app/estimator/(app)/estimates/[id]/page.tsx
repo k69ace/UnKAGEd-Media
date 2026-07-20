@@ -42,6 +42,17 @@ export default async function EstimateBuilderPage({ params }: { params: Promise<
             {estimate.customers?.name ?? "Estimate"}
             {estimate.customers?.company_name ? ` — ${estimate.customers.company_name}` : ""}
           </h1>
+          <div className="mt-1 flex gap-3 text-xs">
+            <a href={`/estimator/estimates/${estimate.id}/proposal`} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+              Customer proposal (PDF)
+            </a>
+            <a href={`/estimator/estimates/${estimate.id}/internal-sheet`} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+              Internal sheet (PDF)
+            </a>
+            <a href={`/estimator/estimates/${estimate.id}/internal-csv`} className="underline underline-offset-2">
+              Internal detail (CSV)
+            </a>
+          </div>
         </div>
         {versions.length > 1 && (
           <div className="text-xs text-foreground/50">

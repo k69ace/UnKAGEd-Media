@@ -72,9 +72,19 @@ export default async function PipelinePage({
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-semibold">Pipeline</h1>
-        <Link href="/estimator/estimates/new" className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background">
-          New Estimate
-        </Link>
+        <div className="flex items-center gap-3">
+          <a
+            href={`/estimator/pipeline/export?${new URLSearchParams(
+              Object.fromEntries(Object.entries(params).filter(([, v]) => v)) as Record<string, string>,
+            ).toString()}`}
+            className="text-sm text-foreground/60 underline underline-offset-2"
+          >
+            Export CSV
+          </a>
+          <Link href="/estimator/estimates/new" className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background">
+            New Estimate
+          </Link>
+        </div>
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">

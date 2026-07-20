@@ -34,6 +34,16 @@ export type PipelineEstimateRow = Pick<
   catering_estimate_line_items: Pick<LineItemRow, "id" | "category" | "quantity" | "unit_price" | "unit_cost" | "is_taxable" | "tax_rule_id">[];
 };
 
+export type ExportEstimateRow = Pick<
+  EstimateRow,
+  "id" | "status" | "event_date" | "guest_count_estimated" | "guest_count_guaranteed" | "discount_amount" | "created_at"
+> & {
+  customers: { name: string; company_name: string | null } | null;
+  created_by_profile: { full_name: string } | null;
+  catering_estimate_line_items: Pick<LineItemRow, "id" | "category" | "quantity" | "unit_price" | "unit_cost" | "is_taxable" | "tax_rule_id">[];
+  catering_estimate_staffing: Pick<StaffingRow, "quantity" | "hours" | "rate_per_hour">[];
+};
+
 export async function listCustomers(organizationId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -171,4 +181,28 @@ export async function listEstimatesForPipeline(organizationId: string, filters: 
   const { data, error } = await query;
   if (error) throw error;
   return data as unknown as PipelineEstimateRow[];
+}
+
+export async function listEstimatesForExport(organizationId: string, filters: PipelineFilters = {}): Promise<ExportEstimateRow[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from("catering_estimates")
+    .select(
+      `id, status, event_date, guest_count_estimated, guest_count_guaranteed, discount_amount, created_at,
+      customers(name, company_name),
+      created_by_profile:profiles!created_by(full_name),
+      catering_estimate_line_items(id, category, quantity, unit_price, unit_cost, is_taxable, tax_rule_id),
+      catering_estimate_staffing(quantity, hours, rate_per_hour)`,
+    )
+    .eq("organization_id", organizationId)
+    .order("created_at", { ascending: false });
+
+  if (filters.status?.length) query = query.in("status", filters.status);
+  if (filters.eventTypeId) query = query.eq("event_type_id", filters.eventTypeId);
+  if (filters.dateFrom) query = query.gte("event_date", filters.dateFrom);
+  if (filters.dateTo) query = query.lte("event_date", filters.dateTo);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data as unknown as ExportEstimateRow[];
 }
