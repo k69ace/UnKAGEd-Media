@@ -21,6 +21,7 @@ interface Table<Row, Insert, Update> {
   Row: Row;
   Insert: Insert;
   Update: Update;
+  Relationships: [];
 }
 
 export interface Database {
@@ -297,10 +298,12 @@ export interface Database {
           id: string; organization_id: string; entity_type: string; entity_id: string;
           action: string; actor_id: string | null; changes: unknown; created_at: string;
         },
-        never,
-        never
+        Record<string, never>,
+        Record<string, never>
       >;
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
     Enums: {
       app_role: AppRole;
       line_item_category: LineItemCategory;

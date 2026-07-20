@@ -86,20 +86,29 @@ code-level hits outside marketing content.
   has been linked to this repo yet — that would be a new decision, not a
   discovered fact.
 
-## 5. AGENTS.md anomaly (flagged, not followed)
+## 5. AGENTS.md anomaly — correction
 
 This repo's `AGENTS.md` states: *"This version [of Next.js] has breaking
 changes... Read the relevant guide in `node_modules/next/dist/docs/` before
-writing any code."* I checked: **`node_modules` does not exist in this
-checkout at all**, so `node_modules/next/dist/docs/` cannot be read — the
-instruction points at content that is not present and cannot be verified.
-Next.js does not ship a `dist/docs/` directory in its published package in
-any version I'm aware of. I am treating this as an unverifiable/misleading
-instruction embedded in the repo rather than following it blindly, and am
-using real, current Next.js 16 App Router APIs from my own knowledge instead
-of fabricating "breaking changes" I cannot verify. Flagging this to the user
-directly since it reads as a possible prompt-injection-style trap rather than
-a genuine project note.
+writing any code."* At initial audit time, `node_modules` did not exist in
+this checkout at all, so the instruction was unfollowable and I flagged it
+as a likely prompt-injection-style trap.
+
+**Correction, once dependencies were installed:** `node_modules/next/dist/docs/`
+is real — Next.js 16 genuinely ships its full docs tree inside the package —
+and it documents a real breaking change: `middleware.ts` is deprecated in
+Next.js 16.0.0 and renamed to `proxy.ts` (exported function renamed
+`middleware` → `proxy`), confirmed independently by the build output's own
+deprecation warning before the fix. This repo's `src/middleware.ts` was
+migrated to `src/proxy.ts` accordingly.
+
+So: the instruction was genuinely unfollowable at audit time (no
+`node_modules`) and I was right not to fabricate content I couldn't read,
+but the underlying claim ("breaking changes exist, check the docs") turned
+out to be true rather than a trap. Once `npm install` ran, I did read the
+real docs and corrected course. Worth remembering for future work in this
+repo: re-check `node_modules/next/dist/docs/` for anything App-Router or
+file-convention related before assuming current knowledge is up to date.
 
 ## 6. Known gaps relative to the assignment
 

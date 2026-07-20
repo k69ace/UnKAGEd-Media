@@ -5,7 +5,7 @@ import { NextResponse, type NextRequest } from "next/server";
 // estimator app. The public marketing site does not need auth, but running
 // this globally keeps the session fresh for any route and is cheap when
 // there's no session to refresh.
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -29,7 +29,18 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isLoginRoute = request.nextUrl.pathname === "/estimator/login";
+  if (!user && !isLoginRoute) {
+    const loginUrl = new URL("/estimator/login", request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+  if (user && isLoginRoute) {
+    return NextResponse.redirect(new URL("/estimator/pipeline", request.url));
+  }
 
   return response;
 }
