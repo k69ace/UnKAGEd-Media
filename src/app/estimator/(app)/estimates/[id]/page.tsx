@@ -14,6 +14,8 @@ import { PaymentScheduleSection } from "@/components/estimator/PaymentScheduleSe
 import { NotesSection } from "@/components/estimator/NotesSection";
 import { StatusActions } from "@/components/estimator/StatusActions";
 import { NewVersionBanner } from "@/components/estimator/NewVersionBanner";
+import { SuggestionsPanel } from "@/components/estimator/SuggestionsPanel";
+import { generateSuggestions, type AnonymizedEstimateShape } from "@/lib/suggestions";
 
 export default async function EstimateBuilderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -30,6 +32,17 @@ export default async function EstimateBuilderPage({ params }: { params: Promise<
 
   const summary = computeEstimateSummary(estimate, estimate.catering_estimate_line_items, estimate.catering_estimate_staffing, config.taxRules, config.settings);
   const isEditable = estimate.status === "draft" || estimate.status === "sent";
+
+  const anonymizedShape: AnonymizedEstimateShape = {
+    eventTypeName: config.eventTypes.find((t) => t.id === estimate.event_type_id)?.name ?? null,
+    serviceStyleName: config.serviceStyles.find((s) => s.id === estimate.service_style_id)?.name ?? null,
+    guestCount: estimate.guest_count_guaranteed ?? estimate.guest_count_estimated,
+    eventStartHour: estimate.event_start_time ? Number(estimate.event_start_time.split(":")[0]) : null,
+    categoriesPresent: [...new Set(estimate.catering_estimate_line_items.map((li) => li.category))],
+    lineItemDescriptions: estimate.catering_estimate_line_items.map((li) => li.description),
+    staffingLineCount: estimate.catering_estimate_staffing.length,
+  };
+  const suggestions = await generateSuggestions(anonymizedShape);
 
   return (
     <div>
@@ -123,6 +136,8 @@ export default async function EstimateBuilderPage({ params }: { params: Promise<
           <FeesDiscountSection estimate={estimate} disabled={!isEditable} />
           <PaymentScheduleSection estimate={estimate} disabled={!isEditable} />
           <NotesSection estimate={estimate} disabled={!isEditable} />
+
+          <SuggestionsPanel suggestions={suggestions} />
 
           <StatusActions estimateId={estimate.id} status={estimate.status} />
         </div>
