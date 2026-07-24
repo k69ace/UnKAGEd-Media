@@ -18,16 +18,25 @@ Five roles exist (`profiles.role` in the database):
 | `reporting_readonly` | View pipeline and estimate history only — cannot create, edit, or change status |
 
 New sign-ups default to `sales_manager` in a brand-new organization.
-**There's no in-app role-change or invite-teammate UI yet** — to change
-someone's role or move a second sign-up into an existing organization
-instead of their own new one, update the `profiles` table directly (SQL
-Editor or Table Editor in the Supabase dashboard):
+`/estimator/settings` → **Team** lists everyone already in your
+organization with a role dropdown per person and an active/deactivated
+toggle — use it to promote/demote teammates or deactivate someone who's
+left (deactivating actually revokes access immediately; it isn't cosmetic
+— see the module README's note on migration 007). You can't deactivate
+your own account or remove the organization's last admin from that page;
+both are blocked with a clear error.
+
+**There's still no invite-teammate flow.** A new person always creates
+their *own* organization by signing up — there's no "invite to my org"
+step. To move a stray second sign-up into your existing organization
+instead (and then manage their role normally from Team), update the
+`profiles` table directly (SQL Editor or Table Editor in the Supabase
+dashboard):
 
 ```sql
-update profiles set role = 'manager_owner' where email = 'owner@example.com';
--- to merge a stray second organization into the first, also update
--- profiles.organization_id for that user and delete the empty
--- organization it created on sign-up.
+update profiles set organization_id = '<your-org-id>' where email = 'newperson@example.com';
+-- then delete the empty organization their sign-up created, if you want:
+delete from organizations where id = '<their-old-org-id>';
 ```
 
 ## Tax Rules

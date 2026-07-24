@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { assertRole, requireProfile, ADMIN_ROLES } from "@/lib/auth/profile";
+import type { AppRole } from "@/lib/supabase/types";
+
+const VALID_ROLES: AppRole[] = ["catering_admin", "manager_owner", "sales_manager", "chef", "reporting_readonly"];
 
 type ChargeType = "flat" | "percent";
 type ServiceChargeBase = "discounted_subtotal" | "discounted_subtotal_excluding_alcohol";
@@ -196,6 +199,90 @@ export async function updateChargeSettings(_prev: SettingsActionState, formData:
         ? Number(formData.get("defaultProfitTargetPercent")) / 100
         : null,
     })
+    .eq("organization_id", profile.organizationId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+async function countActiveAdmins(organizationId: string, excludingProfileId?: string): Promise<number> {
+  const supabase = await createClient();
+  let query = supabase
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("organization_id", organizationId)
+    .eq("is_active", true)
+    .in("role", ADMIN_ROLES);
+  if (excludingProfileId) query = query.neq("id", excludingProfileId);
+  const { count } = await query;
+  return count ?? 0;
+}
+
+export async function updateMemberRole(memberId: string, newRole: string): Promise<{ error?: string }> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  if (!VALID_ROLES.includes(newRole as AppRole)) return { error: "Not a valid role." };
+  const role = newRole as AppRole;
+
+  const supabase = await createClient();
+  const { data: member } = await supabase
+    .from("profiles")
+    .select("id, role, organization_id")
+    .eq("id", memberId)
+    .eq("organization_id", profile.organizationId)
+    .single();
+  if (!member) return { error: "Team member not found." };
+
+  const wasAdmin = ADMIN_ROLES.includes(member.role);
+  const willBeAdmin = ADMIN_ROLES.includes(role);
+  if (wasAdmin && !willBeAdmin) {
+    const remaining = await countActiveAdmins(profile.organizationId, memberId);
+    if (remaining === 0) {
+      return { error: "Can't remove the last admin — promote someone else first." };
+    }
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role })
+    .eq("id", memberId)
+    .eq("organization_id", profile.organizationId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+export async function toggleMemberActive(memberId: string, isActive: boolean): Promise<{ error?: string }> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  if (memberId === profile.id && !isActive) {
+    return { error: "You can't deactivate your own account." };
+  }
+
+  const supabase = await createClient();
+  const { data: member } = await supabase
+    .from("profiles")
+    .select("id, role, is_active")
+    .eq("id", memberId)
+    .eq("organization_id", profile.organizationId)
+    .single();
+  if (!member) return { error: "Team member not found." };
+
+  if (!isActive && member.is_active && ADMIN_ROLES.includes(member.role)) {
+    const remaining = await countActiveAdmins(profile.organizationId, memberId);
+    if (remaining === 0) {
+      return { error: "Can't deactivate the last admin — promote someone else first." };
+    }
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ is_active: isActive })
+    .eq("id", memberId)
     .eq("organization_id", profile.organizationId);
   if (error) return { error: error.message };
 

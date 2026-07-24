@@ -119,6 +119,18 @@ not the app). Migrations 001–004 applied cleanly before it first stuck;
 005–006 were eventually applied by the user directly via the Supabase SQL
 Editor after I provided the exact SQL, and `generate_typescript_types`
 was never reachable, hence the hand-written types documented above.
+**Migration 007 (`enforce_profile_active`) is written and committed but
+its application status is unconfirmed as of this report** — I provided
+the SQL to the user to run directly rather than retrying the MCP tool.
+Until it's applied, the Team page's "deactivate" toggle updates
+`profiles.is_active` but that flag isn't enforced by any RLS policy yet,
+so it would currently be cosmetic, not a real access control. Confirm via
+the SQL Editor:
+
+```sql
+select prosrc from pg_proc where proname = 'current_organization_id';
+-- should contain "and is_active = true" if migration 007 is applied
+```
 
 ## Known Limitations
 
@@ -130,10 +142,18 @@ was never reachable, hence the hand-written types documented above.
   (amount/due date/paid per row, saved to `payment_schedule_json`, server-
   validated against the grand total, surfaced on the customer proposal
   PDF) in addition to the deposit amount/due date fields.
-- **No in-app role management or teammate invite flow.** New sign-ups
-  always create a new organization as `sales_manager`. Changing a role or
-  merging a second sign-up into an existing organization requires editing
-  the `profiles` table directly (documented in the admin guide).
+- **In-app role management now exists** (Settings → Team: role dropdown +
+  active/deactivated toggle per teammate, with server-side protection
+  against deactivating yourself or removing the org's last admin).
+  **No invite flow still** — a new sign-up always creates its own
+  organization; merging a stray one into an existing org still requires a
+  direct `profiles.organization_id` edit (documented in the admin guide).
+  Deactivation is a real access control, not cosmetic: migration 007
+  (`enforce_profile_active`) redefines `current_organization_id()` and
+  `current_app_role()` to require `is_active = true`, so every RLS policy
+  in the schema fails closed for a deactivated profile. **This migration
+  was written but not yet confirmed applied** — see the verification note
+  below.
 - **No CRUD UI for package templates.** Event types, service styles, and
   staffing roles now have one (Settings — add/deactivate, plus rate/ratio
   for staffing roles); package templates still ship with a seeded example

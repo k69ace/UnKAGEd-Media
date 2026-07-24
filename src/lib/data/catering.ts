@@ -44,6 +44,17 @@ export type ExportEstimateRow = Pick<
   catering_estimate_staffing: Pick<StaffingRow, "quantity" | "hours" | "rate_per_hour">[];
 };
 
+export async function listOrgMembers(organizationId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, full_name, email, role, is_active, created_at")
+    .eq("organization_id", organizationId)
+    .order("created_at");
+  if (error) throw error;
+  return data;
+}
+
 export async function listCustomers(organizationId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
