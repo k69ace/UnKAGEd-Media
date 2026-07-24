@@ -64,6 +64,106 @@ export async function toggleTaxRuleActive(taxRuleId: string, isActive: boolean):
   return {};
 }
 
+export async function createEventType(_prev: SettingsActionState, formData: FormData): Promise<SettingsActionState> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "Name is required." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("event_types").insert({ organization_id: profile.organizationId, name });
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+export async function toggleEventTypeActive(id: string, isActive: boolean): Promise<{ error?: string }> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("event_types")
+    .update({ is_active: isActive })
+    .eq("id", id)
+    .eq("organization_id", profile.organizationId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+export async function createServiceStyle(_prev: SettingsActionState, formData: FormData): Promise<SettingsActionState> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "Name is required." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("service_styles").insert({ organization_id: profile.organizationId, name });
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+export async function toggleServiceStyleActive(id: string, isActive: boolean): Promise<{ error?: string }> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("service_styles")
+    .update({ is_active: isActive })
+    .eq("id", id)
+    .eq("organization_id", profile.organizationId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+export async function createStaffingRole(_prev: SettingsActionState, formData: FormData): Promise<SettingsActionState> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "Name is required." };
+  const rate = formData.get("defaultRatePerHour") ? Number(formData.get("defaultRatePerHour")) : null;
+  const ratio = formData.get("defaultRatioGuestsPerStaff") ? Number(formData.get("defaultRatioGuestsPerStaff")) : null;
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("staffing_roles").insert({
+    organization_id: profile.organizationId,
+    name,
+    default_rate_per_hour: rate,
+    default_ratio_guests_per_staff: ratio,
+  });
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+export async function toggleStaffingRoleActive(id: string, isActive: boolean): Promise<{ error?: string }> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("staffing_roles")
+    .update({ is_active: isActive })
+    .eq("id", id)
+    .eq("organization_id", profile.organizationId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
 export async function updateChargeSettings(_prev: SettingsActionState, formData: FormData): Promise<SettingsActionState> {
   const profile = await requireProfile();
   assertRole(profile, ADMIN_ROLES);

@@ -88,18 +88,20 @@ database but isn't enforced anywhere in the app yet (no gating on
 Approved/Send). Treat it as a documented placeholder, not a working
 feature — see Known Limitations in the completion report.
 
+## Event Types, Service Styles &amp; Staffing Roles
+
+`/estimator/settings` also manages these — each has a name and an active
+toggle (Staffing Roles additionally has a default rate/hr and a default
+guest-per-staff ratio, which pre-fill the Staffing section when building
+an estimate but don't lock anything in). New organizations start with
+seeded defaults (Event types: Wedding, Corporate, Private Party, Drop-off.
+Service styles: Plated, Buffet, Family-Style, Stations, Drop-off. Staffing
+roles: Server, Bartender, Captain, Chef) that you can add to or deactivate
+from here. There's no rename/delete from this page yet — deactivate and
+add a replacement instead, the same pattern as Tax Rules.
+
 ## Not yet manageable from Settings
 
-These have sensible seeded defaults per organization (created
-automatically when the organization is created) but no admin UI yet.
-Manage them via the Supabase Table Editor:
-
-- **Event types** (`event_types` table) — seeded: Wedding, Corporate,
-  Private Party, Drop-off.
-- **Service styles** (`service_styles` table) — seeded: Plated, Buffet,
-  Family-Style, Stations, Drop-off.
-- **Staffing roles & default rates/ratios** (`staffing_roles` table) —
-  seeded: Server, Bartender, Captain, Chef.
 - **Package templates** (`catering_package_templates` +
   `catering_package_template_line_items`) — none seeded by default; add
   via SQL, or as a starting point, adapt the demo package template created

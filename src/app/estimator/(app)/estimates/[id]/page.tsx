@@ -6,6 +6,7 @@ import { computeEstimateSummary } from "@/lib/calculations/estimateSummary";
 import { CATEGORY_LABELS, MENU_PACKAGE_CATEGORIES, BEVERAGE_CATEGORIES, RENTALS_LOGISTICS_CATEGORIES, STATUS_LABELS } from "@/lib/constants/catering";
 import { RunningTotalSidebar } from "@/components/estimator/RunningTotalSidebar";
 import { EventDetailsSection } from "@/components/estimator/EventDetailsSection";
+import { GuestCountHistory } from "@/components/estimator/GuestCountHistory";
 import { LineItemsSection } from "@/components/estimator/LineItemsSection";
 import { PackageTemplatePicker } from "@/components/estimator/PackageTemplatePicker";
 import { StaffingSection } from "@/components/estimator/StaffingSection";
@@ -97,6 +98,8 @@ export default async function EstimateBuilderPage({ params }: { params: Promise<
             serviceStyles={config.serviceStyles}
             disabled={!isEditable}
           />
+
+          <GuestCountHistory history={estimate.catering_estimate_guest_count_history} />
 
           {isEditable && <PackageTemplatePicker estimateId={estimate.id} templates={config.packageTemplates} />}
           <LineItemsSection

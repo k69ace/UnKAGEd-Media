@@ -18,7 +18,7 @@ export type EstimateDetail = EstimateRow & {
   contacts: { id: string; first_name: string; last_name: string; email: string | null; phone: string | null } | null;
   catering_estimate_line_items: LineItemRow[];
   catering_estimate_staffing: (StaffingRow & { staffing_roles: { name: string } | null })[];
-  catering_estimate_guest_count_history: GuestCountHistoryRow[];
+  catering_estimate_guest_count_history: (GuestCountHistoryRow & { profiles: { full_name: string } | null })[];
 };
 
 export type PackageTemplateWithLineItems = PackageTemplateRow & {
@@ -77,6 +77,39 @@ export async function listAllTaxRules(organizationId: string) {
   return data;
 }
 
+export async function listAllEventTypes(organizationId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("event_types")
+    .select("id, name, is_active")
+    .eq("organization_id", organizationId)
+    .order("sort_order");
+  if (error) throw error;
+  return data;
+}
+
+export async function listAllServiceStyles(organizationId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("service_styles")
+    .select("id, name, is_active")
+    .eq("organization_id", organizationId)
+    .order("sort_order");
+  if (error) throw error;
+  return data;
+}
+
+export async function listAllStaffingRoles(organizationId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("staffing_roles")
+    .select("id, name, default_rate_per_hour, default_ratio_guests_per_staff, is_active")
+    .eq("organization_id", organizationId)
+    .order("name");
+  if (error) throw error;
+  return data;
+}
+
 export async function listOrgConfig(organizationId: string) {
   const supabase = await createClient();
   const [taxRules, eventTypes, serviceStyles, staffingRoles, settings, packageTemplates] = await Promise.all([
@@ -120,7 +153,7 @@ export async function getEstimate(estimateId: string): Promise<EstimateDetail> {
       contacts(id, first_name, last_name, email, phone),
       catering_estimate_line_items(*),
       catering_estimate_staffing(*, staffing_roles(name)),
-      catering_estimate_guest_count_history(*)`,
+      catering_estimate_guest_count_history(*, profiles(full_name))`,
     )
     .eq("id", estimateId)
     .single();

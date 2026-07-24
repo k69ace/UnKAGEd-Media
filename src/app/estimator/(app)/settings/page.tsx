@@ -1,7 +1,10 @@
 import { requireProfile, ADMIN_ROLES } from "@/lib/auth/profile";
-import { listAllTaxRules, listOrgConfig } from "@/lib/data/catering";
+import { listAllEventTypes, listAllServiceStyles, listAllStaffingRoles, listAllTaxRules, listOrgConfig } from "@/lib/data/catering";
 import { TaxRulesManager } from "@/components/estimator/TaxRulesManager";
 import { ChargeSettingsForm } from "@/components/estimator/ChargeSettingsForm";
+import { NamedListManager } from "@/components/estimator/NamedListManager";
+import { StaffingRolesManager } from "@/components/estimator/StaffingRolesManager";
+import { createEventType, createServiceStyle, toggleEventTypeActive, toggleServiceStyleActive } from "./actions";
 
 export default async function SettingsPage() {
   const profile = await requireProfile();
@@ -14,9 +17,12 @@ export default async function SettingsPage() {
     );
   }
 
-  const [config, allTaxRules] = await Promise.all([
+  const [config, allTaxRules, allEventTypes, allServiceStyles, allStaffingRoles] = await Promise.all([
     listOrgConfig(profile.organizationId),
     listAllTaxRules(profile.organizationId),
+    listAllEventTypes(profile.organizationId),
+    listAllServiceStyles(profile.organizationId),
+    listAllStaffingRoles(profile.organizationId),
   ]);
 
   return (
@@ -45,12 +51,49 @@ export default async function SettingsPage() {
         </div>
       </section>
 
+      <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
+        <section>
+          <h2 className="text-base font-semibold">Event Types</h2>
+          <div className="mt-4">
+            <NamedListManager
+              items={allEventTypes}
+              itemLabel="Event type"
+              createAction={createEventType}
+              toggleAction={toggleEventTypeActive}
+            />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold">Service Styles</h2>
+          <div className="mt-4">
+            <NamedListManager
+              items={allServiceStyles}
+              itemLabel="Service style"
+              createAction={createServiceStyle}
+              toggleAction={toggleServiceStyleActive}
+            />
+          </div>
+        </section>
+      </div>
+
+      <section>
+        <h2 className="text-base font-semibold">Staffing Roles</h2>
+        <p className="mt-1 text-sm text-foreground/60">
+          Default rate and guest ratio pre-fill the Staffing section when building an estimate — they don&apos;t
+          lock in a rate; sales staff can still adjust per estimate.
+        </p>
+        <div className="mt-4">
+          <StaffingRolesManager roles={allStaffingRoles} />
+        </div>
+      </section>
+
       <section className="rounded-lg border border-dashed border-foreground/15 p-4 text-sm text-foreground/60">
         <p className="font-medium text-foreground/80">Not yet manageable from this page</p>
         <p className="mt-1">
-          Event types, service styles, staffing roles/ratios, and package templates ship with sensible defaults per
-          organization but don&apos;t have a dedicated admin UI yet — edit them directly via the Supabase Table Editor
-          for now. See Known Limitations in the module README.
+          Package templates don&apos;t have a dedicated admin UI yet — edit them directly via the Supabase Table
+          Editor, or adapt the demo template created by <code>supabase/seed.sql</code>. See Known Limitations in
+          the module README.
         </p>
       </section>
     </div>

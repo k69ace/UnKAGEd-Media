@@ -82,7 +82,7 @@ settings/seed/docs.
 ## Verification performed
 
 - `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm test`
-  (51 tests) all clean as of the final commit on this branch.
+  (67 tests) all clean as of the final commit on this branch.
 - Schema/RLS verified live against the Supabase project via SQL Editor
   queries (not just "the migration ran without an error").
 - A real browser smoke test against the dev server (Playwright) caught and
@@ -133,19 +133,21 @@ was never reachable, hence the hand-written types documented above.
   always create a new organization as `sales_manager`. Changing a role or
   merging a second sign-up into an existing organization requires editing
   the `profiles` table directly (documented in the admin guide).
-- **No CRUD UI for event types, service styles, staffing roles, or package
-  templates.** They ship with sensible per-organization defaults (seeded
-  by a database trigger) and are editable via the Supabase Table Editor,
-  not the app.
+- **No CRUD UI for package templates.** Event types, service styles, and
+  staffing roles now have one (Settings — add/deactivate, plus rate/ratio
+  for staffing roles); package templates still ship with a seeded example
+  from `supabase/seed.sql` only and are editable via the Supabase Table
+  Editor, not the app.
 - **`chef_review_required` is an unenforced database field.** No
   feasibility-review workflow step gates Send or Approve today.
 - **No CSV import for menu/pricing catalogs**, despite being listed under
   MVP integrations scope — export exists, import doesn't.
 - **Customer proposal PDF is always itemized**, not configurable to a
   package-summary view (spec allowed either, configurable per org).
-- **Guest-count change history is recorded** (every change, by whom, when
-  — a database trigger) **but has no UI to view it.** The data exists for
-  a future billing-dispute audit view.
+- **Guest-count change history** is recorded (every change, by whom, when
+  — a database trigger) and now has a UI: a collapsible "Guest Count
+  History" panel on the estimate detail page, for exactly the
+  billing-dispute scenario the spec called out.
 - **No diff view between estimate versions** — the version-history
   breadcrumb links to each version's full page, not a side-by-side diff.
 - **Pipeline filters** don't include location or sales-owner, only event
@@ -154,13 +156,16 @@ was never reachable, hence the hand-written types documented above.
 - **No in-app audit-log viewer** — `audit_log` is populated correctly but
   only queryable via the database directly.
 - **Test coverage gap vs. the spec's Testing section**: unit tests exist
-  for calculations, DB-row mapping, CSV safety, PDF generation, and the
-  suggestions rules engine (51 tests). Not built: integration tests for
-  the full create→send→approve→won workflow, permission tests per role,
-  responsive UI tests, empty/failure-state tests, and CSV *import*
-  validation tests (there's no import feature to test). This tracks
-  directly from the environment constraint above — these are exactly the
-  tests that need a real browser against a real signed-in session.
+  for calculations, DB-row mapping, CSV safety, PDF generation, the
+  suggestions rules engine, and role-gating (`assertRole`, every role
+  constant list) — 67 tests. Still not built: integration tests for the
+  full create→send→approve→won workflow, responsive UI tests,
+  empty/failure-state tests, and CSV *import* validation tests (there's no
+  import feature to test). These specifically need a real browser against
+  a real signed-in session, which this sandbox's network policy blocks
+  (see above) — the role-gating logic itself is now tested at the unit
+  level, but not the end-to-end "a reporting_readonly user literally
+  cannot click Send" browser-level guarantee.
 - **No e-signature** — the PDF has a blank "approved by (print name)" /
   date line, matching the spec's stated MVP acceptance.
 
@@ -182,5 +187,5 @@ was never reachable, hence the hand-written types documented above.
 | Version history preserved for post-approval edits | Done |
 | No internal cost/margin data on a customer-facing export | Done — tested |
 | Role-based access and approval-threshold logic enforced server-side | Done (`assertRole` + RLS) |
-| All calculation tests pass; no floating-point currency bugs | Done — 51/51 passing, epsilon-corrected rounding |
+| All calculation tests pass; no floating-point currency bugs | Done — 67/67 passing, epsilon-corrected rounding |
 | `AUDIT_CATERING.md` and this report committed and accurate | Done |
