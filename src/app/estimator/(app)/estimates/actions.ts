@@ -324,6 +324,70 @@ export async function updatePaymentSchedule(estimateId: string, formData: FormDa
   }
 }
 
+export interface PaymentInstallmentInput {
+  amount: number;
+  dueDate: string;
+  paid: boolean;
+}
+
+export async function updatePaymentInstallments(
+  estimateId: string,
+  installments: PaymentInstallmentInput[],
+): Promise<{ error?: string }> {
+  try {
+    const profile = await requireProfile();
+    assertRole(profile, ESTIMATE_WRITE_ROLES);
+    const targetId = await ensureEditableVersion(estimateId);
+
+    for (const installment of installments) {
+      if (!Number.isFinite(installment.amount) || installment.amount < 0) {
+        return { error: "Every installment amount must be a non-negative number." };
+      }
+      if (!installment.dueDate) {
+        return { error: "Every installment needs a due date." };
+      }
+    }
+
+    const supabase = await createClient();
+    const estimate = await loadEstimateForMutation(targetId);
+    const { data: settings } = await supabase
+      .from("organization_settings")
+      .select("*")
+      .eq("organization_id", estimate.organization_id)
+      .single();
+    const { data: taxRules } = await supabase.from("tax_rules").select("*").eq("organization_id", estimate.organization_id);
+
+    const summary = computeEstimateSummary(
+      estimate,
+      estimate.catering_estimate_line_items,
+      estimate.catering_estimate_staffing,
+      taxRules ?? [],
+      settings!,
+    );
+    const scheduledTotal = installments.reduce((sum, i) => sum + i.amount, 0);
+    if (scheduledTotal > summary.grandTotal) {
+      return {
+        error: `Scheduled installments ($${scheduledTotal.toFixed(2)}) exceed the grand total ($${summary.grandTotal.toFixed(2)}).`,
+      };
+    }
+
+    const { error } = await supabase
+      .from("catering_estimates")
+      .update({
+        payment_schedule_json: installments.map((i) => ({ amount: i.amount, dueDate: i.dueDate, paid: i.paid })),
+        updated_by: profile.id,
+      })
+      .eq("id", targetId);
+    if (error) throw error;
+
+    revalidateEstimate(targetId);
+    if (targetId !== estimateId) redirect(`/estimator/estimates/${targetId}`);
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Failed to save payment installments." };
+  }
+}
+
 export async function updateNotes(estimateId: string, formData: FormData): Promise<{ error?: string }> {
   try {
     const profile = await requireProfile();

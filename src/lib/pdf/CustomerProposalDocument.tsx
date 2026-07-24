@@ -1,5 +1,6 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { CATEGORY_LABELS } from "@/lib/constants/catering";
+import { parsePaymentSchedule } from "@/lib/calculations/catering";
 import type { EstimateDetail } from "@/lib/data/catering";
 import type { EstimateSummary } from "@/lib/calculations/estimateSummary";
 
@@ -51,6 +52,7 @@ export function CustomerProposalDocument({
   summary: EstimateSummary;
 }) {
   const items = [...estimate.catering_estimate_line_items].sort((a, b) => a.sort_order - b.sort_order);
+  const installments = parsePaymentSchedule(estimate.payment_schedule_json);
 
   return (
     <Document title={`Catering Proposal — ${estimate.customers?.name ?? "Customer"}`}>
@@ -144,7 +146,7 @@ export function CustomerProposalDocument({
           )}
         </View>
 
-        {(estimate.deposit_amount || estimate.deposit_due_date) && (
+        {(estimate.deposit_amount || estimate.deposit_due_date || installments.length > 0) && (
           <View>
             <Text style={styles.sectionTitle}>Payment Schedule</Text>
             {estimate.deposit_amount != null && (
@@ -152,6 +154,12 @@ export function CustomerProposalDocument({
                 Deposit due{estimate.deposit_due_date ? ` ${estimate.deposit_due_date}` : ""}: {money(estimate.deposit_amount)}
               </Text>
             )}
+            {installments.map((installment, i) => (
+              <Text key={i}>
+                Installment due {installment.dueDate || "TBD"}: {money(installment.amount)}
+                {installment.paid ? " (paid)" : ""}
+              </Text>
+            ))}
             {summary.depositRemaining !== null && <Text>Balance due: {money(summary.depositRemaining)}</Text>}
           </View>
         )}

@@ -126,9 +126,10 @@ was never reachable, hence the hand-written types documented above.
   changes — up/down arrows and a dropdown are the (fully accessible)
   implementation. Spec allowed this ("accessible... non-drag fallback");
   drag-and-drop itself is a follow-up, not shipped.
-- **Payment schedule is deposit + due date only**, not a full multi-
-  installment schedule — `payment_schedule_json` exists in the schema for
-  this but has no editor UI yet.
+- **Payment schedule** now supports a full multi-installment editor
+  (amount/due date/paid per row, saved to `payment_schedule_json`, server-
+  validated against the grand total, surfaced on the customer proposal
+  PDF) in addition to the deposit amount/due date fields.
 - **No in-app role management or teammate invite flow.** New sign-ups
   always create a new organization as `sales_manager`. Changing a role or
   merging a second sign-up into an existing organization requires editing

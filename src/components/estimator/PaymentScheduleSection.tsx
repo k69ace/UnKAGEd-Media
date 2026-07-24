@@ -2,11 +2,20 @@
 
 import { updatePaymentSchedule } from "@/app/estimator/(app)/estimates/actions";
 import { AutosaveSection, type SectionState } from "./AutosaveSection";
+import { PaymentInstallmentsEditor } from "./PaymentInstallmentsEditor";
 import type { EstimateDetail } from "@/lib/data/catering";
 
 const inputClass = "rounded-md border border-foreground/15 bg-transparent px-3 py-2 outline-none focus:border-foreground/40";
 
-export function PaymentScheduleSection({ estimate, disabled }: { estimate: EstimateDetail; disabled: boolean }) {
+export function PaymentScheduleSection({
+  estimate,
+  grandTotal,
+  disabled,
+}: {
+  estimate: EstimateDetail;
+  grandTotal: number;
+  disabled: boolean;
+}) {
   const action = async (_prev: SectionState, formData: FormData) => updatePaymentSchedule(estimate.id, formData);
 
   return (
@@ -21,9 +30,13 @@ export function PaymentScheduleSection({ estimate, disabled }: { estimate: Estim
           <input name="depositDueDate" type="date" defaultValue={estimate.deposit_due_date ?? ""} className={inputClass} />
         </label>
       </div>
-      <p className="text-xs text-foreground/50">
-        A detailed multi-installment schedule is on the roadmap — see Known Limitations. Deposit due + remaining balance is tracked today.
-      </p>
+
+      <PaymentInstallmentsEditor
+        estimateId={estimate.id}
+        paymentScheduleJson={estimate.payment_schedule_json}
+        grandTotal={grandTotal}
+        disabled={disabled}
+      />
     </AutosaveSection>
   );
 }

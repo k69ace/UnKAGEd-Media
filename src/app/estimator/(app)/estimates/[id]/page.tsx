@@ -137,7 +137,7 @@ export default async function EstimateBuilderPage({ params }: { params: Promise<
           />
 
           <FeesDiscountSection estimate={estimate} disabled={!isEditable} />
-          <PaymentScheduleSection estimate={estimate} disabled={!isEditable} />
+          <PaymentScheduleSection estimate={estimate} grandTotal={summary.grandTotal} disabled={!isEditable} />
           <NotesSection estimate={estimate} disabled={!isEditable} />
 
           <SuggestionsPanel suggestions={suggestions} />

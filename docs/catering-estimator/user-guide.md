@@ -48,7 +48,12 @@ in the first time — check your inbox for a confirmation link.
   you'll get a clear error if you try) plus an optional minimum spend and
   a per-estimate profit target. Service charge and gratuity themselves are
   configured org-wide by your admin, not per estimate.
-- **Payment Schedule** — deposit amount and due date.
+- **Payment Schedule** — deposit amount and due date, plus an optional
+  installment schedule below it (**Add installment** for as many rows as
+  you need — amount, due date, and a "paid" checkbox — then **Save
+  schedule**). Installments can't total more than the grand total; you'll
+  get a clear error if they do. Anything you add here shows up on the
+  customer proposal PDF.
 - **Notes** — customer-facing notes appear on the PDF proposal; internal
   notes never do.
 - **Suggestions** — plain-language nudges (e.g. "no bar package for an

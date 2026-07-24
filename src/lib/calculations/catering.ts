@@ -280,3 +280,18 @@ export function paymentScheduleBalance(grandTotal: number, schedule: PaymentSche
   const paid = schedule.filter((e) => e.paid).reduce((sum, e) => sum + e.amount, 0);
   return roundCurrency(grandTotal - paid);
 }
+
+/** Safely parses the `payment_schedule_json` column (stored as `unknown` — see
+ *  src/lib/supabase/types.ts) into typed entries, dropping anything malformed
+ *  rather than throwing. Shared by the estimate builder UI and PDF export so
+ *  both interpret the same JSON the same way. */
+export function parsePaymentSchedule(raw: unknown): PaymentScheduleEntry[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((entry): entry is Record<string, unknown> => typeof entry === "object" && entry !== null)
+    .map((entry) => ({
+      amount: typeof entry.amount === "number" ? entry.amount : 0,
+      dueDate: typeof entry.dueDate === "string" ? entry.dueDate : "",
+      paid: entry.paid === true,
+    }));
+}

@@ -11,6 +11,7 @@ import {
   internalCostTotal,
   lineItemTaxTotal,
   lineItemTotal,
+  parsePaymentSchedule,
   paymentScheduleBalance,
   perPersonPrice,
   roundCurrency,
@@ -311,5 +312,30 @@ describe("deposit and payment schedule", () => {
 
   it("ignores unpaid entries when computing the current balance", () => {
     expect(paymentScheduleBalance(1000, [{ amount: 1000, dueDate: "2026-08-01", paid: false }])).toBe(1000);
+  });
+});
+
+describe("parsePaymentSchedule", () => {
+  it("parses a well-formed array from the JSONB column", () => {
+    const result = parsePaymentSchedule([
+      { amount: 500, dueDate: "2026-08-01", paid: true },
+      { amount: 250.5, dueDate: "2026-09-01" },
+    ]);
+    expect(result).toEqual([
+      { amount: 500, dueDate: "2026-08-01", paid: true },
+      { amount: 250.5, dueDate: "2026-09-01", paid: false },
+    ]);
+  });
+
+  it("returns an empty array for null, undefined, or non-array JSON", () => {
+    expect(parsePaymentSchedule(null)).toEqual([]);
+    expect(parsePaymentSchedule(undefined)).toEqual([]);
+    expect(parsePaymentSchedule({ amount: 1 })).toEqual([]);
+    expect(parsePaymentSchedule("not an array")).toEqual([]);
+  });
+
+  it("drops non-object entries and defaults malformed fields instead of throwing", () => {
+    const result = parsePaymentSchedule([null, "garbage", 42, { amount: "500", paid: "yes" }]);
+    expect(result).toEqual([{ amount: 0, dueDate: "", paid: false }]);
   });
 });
