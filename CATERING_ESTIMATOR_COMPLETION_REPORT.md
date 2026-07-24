@@ -82,7 +82,7 @@ settings/seed/docs.
 ## Verification performed
 
 - `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm test`
-  (105 tests) all clean as of the final commit on this branch.
+  (119 tests) all clean as of the final commit on this branch.
 - Schema/RLS verified live against the Supabase project via SQL Editor
   queries (not just "the migration ran without an error").
 - A real browser smoke test against the dev server (Playwright) caught and
@@ -222,14 +222,22 @@ contents into the Supabase SQL Editor.
   safety and import validation/parsing), PDF generation, the suggestions
   rules engine, role-gating (`assertRole`, every role constant list
   including the chef-review roles), the audit-log summary formatter, and
-  the version-diff matching logic — 105 tests. Still not built:
-  integration tests for the full create→send→approve→won workflow,
-  responsive UI tests, and empty/failure-state tests. These specifically
-  need a real browser against a real signed-in session, which this
-  sandbox's network policy blocks (see above) — the role-gating logic
-  itself is now tested at the unit level, but not the end-to-end "a
-  reporting_readonly user literally cannot click Send" browser-level
-  guarantee.
+  the version-diff matching logic — 119 tests. **Empty/failure-state UI
+  tests now exist too**, at the component level: React Testing Library +
+  jsdom were added (no live Supabase or browser required) and cover
+  `SuggestionsPanel` (renders nothing with zero suggestions),
+  `GuestCountHistory` (renders nothing at ≤1 entries — a single row isn't
+  a "change" yet), `LineItemsSection` (an empty, read-only category
+  renders neither a table nor an add-item form; category filtering is
+  correct), and `StatusActions` (the "No further status changes from
+  here" terminal-status state for won/cancelled, plus a mocked
+  server-action error surfacing as a visible `role="alert"`). Still not
+  built: integration tests for the full create→send→approve→won
+  workflow and responsive UI tests. Those specifically need a real
+  browser against a real signed-in session, which this sandbox's network
+  policy blocks (see above) — the role-gating logic itself is now tested
+  at the unit level, but not the end-to-end "a reporting_readonly user
+  literally cannot click Send" browser-level guarantee.
 - **No e-signature** — the PDF has a blank "approved by (print name)" /
   date line, matching the spec's stated MVP acceptance.
 
