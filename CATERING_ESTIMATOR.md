@@ -55,6 +55,7 @@ src/app/estimator/
     pipeline/                 Pipeline board + KPIs + CSV export
     estimates/new/             Start an estimate (existing/new customer)
     estimates/[id]/             The builder: all sections + PDF/CSV routes
+    estimates/[id]/diff/[otherId]/  Version comparison (added/removed/changed)
     settings/                  Tax rules, service charge/gratuity, approval
 
 src/lib/
@@ -64,6 +65,9 @@ src/lib/
   calculations/catering.ts  Pure calculation engine — no I/O, fully unit-tested
   calculations/mappers.ts   DB row -> calculation-engine input shape
   calculations/estimateSummary.ts  Wires a DB estimate through the engine
+  diff/estimateDiff.ts      Pure version-diff matching (line items/staffing by
+                             category+description/role, not id — cloned rows
+                             get new ids every version)
   suggestions/              Rules-based (+ optional AI) upsell/missing-info engine
   export/csv.ts             Injection-safe CSV builder
   import/                   CSV parsing + package-template import validation
@@ -113,12 +117,12 @@ npm test          # run once
 npm run test:watch
 ```
 
-96 tests across: the calculation engine, the DB-row mapping layer, CSV
+105 tests across: the calculation engine, the DB-row mapping layer, CSV
 injection-safety (export and import), PDF generation (real PDF bytes, real
 assertion that internal cost/margin never appears in the customer
 proposal's bytes), role-gating (`assertRole` and every role constant
-list), the suggestions rules engine, and the audit-log summary formatter.
-See Known Limitations in the completion report
+list), the suggestions rules engine, the audit-log summary formatter, and
+the version-diff matching logic. See Known Limitations in the completion report
 for what test coverage *doesn't* exist yet (integration/workflow tests,
 end-to-end/browser-level permission enforcement, responsive UI tests) —
 the plan explicitly staged "finish create-to-PDF before pipeline/AI," and

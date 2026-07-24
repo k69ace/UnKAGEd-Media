@@ -82,7 +82,10 @@ read-only in the builder — you'll see a banner explaining why, with an
 draft version and takes you there; the approved version stays exactly as
 it was, in the version-history breadcrumb at the top of the page, so
 there's never any ambiguity about what the customer actually saw and
-signed off on.
+signed off on. Each older version in that breadcrumb has a **[compare]**
+link showing exactly what changed against the version you're viewing —
+line items added/removed/changed, staffing changes, and the grand total
+before and after.
 
 ### Activity log
 

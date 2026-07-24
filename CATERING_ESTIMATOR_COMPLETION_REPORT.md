@@ -82,7 +82,7 @@ settings/seed/docs.
 ## Verification performed
 
 - `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm test`
-  (96 tests) all clean as of the final commit on this branch.
+  (105 tests) all clean as of the final commit on this branch.
 - Schema/RLS verified live against the Supabase project via SQL Editor
   queries (not just "the migration ran without an error").
 - A real browser smoke test against the dev server (Playwright) caught and
@@ -195,8 +195,15 @@ contents into the Supabase SQL Editor.
   — a database trigger) and now has a UI: a collapsible "Guest Count
   History" panel on the estimate detail page, for exactly the
   billing-dispute scenario the spec called out.
-- **No diff view between estimate versions** — the version-history
-  breadcrumb links to each version's full page, not a side-by-side diff.
+- **Version diff view now exists**: each non-current entry in the
+  version-history breadcrumb has a "[compare]" link to
+  `/estimator/estimates/[id]/diff/[otherId]`, showing what changed
+  between the two versions — event-detail/terms fields, line items
+  (added/removed/changed, matched by category+description since cloned
+  rows get new ids), staffing (matched by role), and the resulting grand
+  total delta (via `computeEstimateSummary` on both versions, not a raw
+  DB-row diff). The pure matching logic (`src/lib/diff/estimateDiff.ts`)
+  has 9 dedicated unit tests, including duplicate-description pairing.
 - **Pipeline filters now include location and sales owner**, alongside
   event type/date range/guest count — both the board and the CSV export
   respect them, and each pipeline card shows its owner. (Location filter
@@ -214,10 +221,10 @@ contents into the Supabase SQL Editor.
   for calculations, DB-row mapping, CSV safety (both export-injection-
   safety and import validation/parsing), PDF generation, the suggestions
   rules engine, role-gating (`assertRole`, every role constant list
-  including the chef-review roles), and the audit-log summary formatter —
-  96 tests. Still not built: integration tests for the full
-  create→send→approve→won workflow, responsive UI tests, and
-  empty/failure-state tests. These specifically
+  including the chef-review roles), the audit-log summary formatter, and
+  the version-diff matching logic — 105 tests. Still not built:
+  integration tests for the full create→send→approve→won workflow,
+  responsive UI tests, and empty/failure-state tests. These specifically
   need a real browser against a real signed-in session, which this
   sandbox's network policy blocks (see above) — the role-gating logic
   itself is now tested at the unit level, but not the end-to-end "a

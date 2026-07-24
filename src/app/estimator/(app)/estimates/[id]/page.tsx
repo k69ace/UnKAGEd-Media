@@ -80,9 +80,14 @@ export default async function EstimateBuilderPage({ params }: { params: Promise<
                 {v.isCurrent ? (
                   <strong>v{v.version}</strong>
                 ) : (
-                  <Link href={`/estimator/estimates/${v.id}`} className="underline">
-                    v{v.version} ({STATUS_LABELS[v.status]})
-                  </Link>
+                  <>
+                    <Link href={`/estimator/estimates/${v.id}`} className="underline">
+                      v{v.version} ({STATUS_LABELS[v.status]})
+                    </Link>{" "}
+                    <Link href={`/estimator/estimates/${estimate.id}/diff/${v.id}`} className="underline">
+                      [compare]
+                    </Link>
+                  </>
                 )}
               </span>
             ))}
