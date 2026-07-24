@@ -58,6 +58,30 @@ export async function listOrgMembers(organizationId: string) {
   return data;
 }
 
+export interface AuditLogEntry {
+  id: string;
+  action: string;
+  changes: unknown;
+  created_at: string;
+  actor_name: string | null;
+}
+
+// audit_log rows are written only by SECURITY DEFINER database triggers
+// (see supabase/migrations/...006_audit_log.sql) -- this is a read-only
+// query, there is deliberately no corresponding write function here.
+export async function getAuditLogForEstimate(estimateId: string): Promise<AuditLogEntry[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("audit_log")
+    .select("id, action, changes, created_at, profiles(full_name)")
+    .eq("entity_type", "catering_estimate")
+    .eq("entity_id", estimateId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const rows = data as unknown as { id: string; action: string; changes: unknown; created_at: string; profiles: { full_name: string } | null }[];
+  return rows.map((r) => ({ id: r.id, action: r.action, changes: r.changes, created_at: r.created_at, actor_name: r.profiles?.full_name ?? null }));
+}
+
 export async function listCustomers(organizationId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase

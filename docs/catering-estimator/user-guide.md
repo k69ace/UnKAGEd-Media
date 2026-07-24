@@ -84,6 +84,14 @@ it was, in the version-history breadcrumb at the top of the page, so
 there's never any ambiguity about what the customer actually saw and
 signed off on.
 
+### Activity log
+
+Below the guest-count history, an **Activity Log** panel (collapsed by
+default — click to expand) lists every status change and every
+post-approval edit made to the estimate: what changed, who did it, and
+when. It's read-only and populated automatically — useful for answering
+"wait, who moved this to Approved?" without asking around.
+
 ## Exporting
 
 From the top of any estimate:

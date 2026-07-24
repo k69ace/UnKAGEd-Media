@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireProfile } from "@/lib/auth/profile";
-import { getEstimate, getVersionHistory, listContactsForCustomer, listOrgConfig } from "@/lib/data/catering";
+import { getAuditLogForEstimate, getEstimate, getVersionHistory, listContactsForCustomer, listOrgConfig } from "@/lib/data/catering";
 import { computeEstimateSummary } from "@/lib/calculations/estimateSummary";
 import { CATEGORY_LABELS, MENU_PACKAGE_CATEGORIES, BEVERAGE_CATEGORIES, RENTALS_LOGISTICS_CATEGORIES, STATUS_LABELS } from "@/lib/constants/catering";
 import { RunningTotalSidebar } from "@/components/estimator/RunningTotalSidebar";
 import { EventDetailsSection } from "@/components/estimator/EventDetailsSection";
 import { GuestCountHistory } from "@/components/estimator/GuestCountHistory";
+import { AuditLogPanel } from "@/components/estimator/AuditLogPanel";
 import { LineItemsSection } from "@/components/estimator/LineItemsSection";
 import { PackageTemplatePicker } from "@/components/estimator/PackageTemplatePicker";
 import { StaffingSection } from "@/components/estimator/StaffingSection";
@@ -25,10 +26,11 @@ export default async function EstimateBuilderPage({ params }: { params: Promise<
   const estimate = await getEstimate(id).catch(() => null);
   if (!estimate || estimate.organization_id !== profile.organizationId) notFound();
 
-  const [config, contacts, versions] = await Promise.all([
+  const [config, contacts, versions, auditLog] = await Promise.all([
     listOrgConfig(profile.organizationId),
     listContactsForCustomer(estimate.customer_id),
     getVersionHistory(estimate.id),
+    getAuditLogForEstimate(estimate.id),
   ]);
 
   const summary = computeEstimateSummary(estimate, estimate.catering_estimate_line_items, estimate.catering_estimate_staffing, config.taxRules, config.settings);
@@ -100,6 +102,7 @@ export default async function EstimateBuilderPage({ params }: { params: Promise<
           />
 
           <GuestCountHistory history={estimate.catering_estimate_guest_count_history} />
+          <AuditLogPanel entries={auditLog} />
 
           {isEditable && <PackageTemplatePicker estimateId={estimate.id} templates={config.packageTemplates} />}
           <LineItemsSection

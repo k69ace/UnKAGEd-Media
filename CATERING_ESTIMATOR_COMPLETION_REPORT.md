@@ -82,7 +82,7 @@ settings/seed/docs.
 ## Verification performed
 
 - `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm test`
-  (86 tests) all clean as of the final commit on this branch.
+  (95 tests) all clean as of the final commit on this branch.
 - Schema/RLS verified live against the Supabase project via SQL Editor
   queries (not just "the migration ran without an error").
 - A real browser smoke test against the dev server (Playwright) caught and
@@ -184,19 +184,26 @@ select prosrc from pg_proc where proname = 'current_organization_id';
   respect them, and each pipeline card shows its owner. (Location filter
   only renders when an org actually has more than one active location,
   to avoid a useless single-option dropdown.)
-- **No in-app audit-log viewer** — `audit_log` is populated correctly but
-  only queryable via the database directly.
+- **In-app audit-log viewer now exists**: a collapsible "Activity Log"
+  panel on the estimate detail page (`AuditLogPanel`), fed by a new
+  `getAuditLogForEstimate()` query joined to the actor's profile. It lists
+  every `audit_log` row for that estimate — creation, status changes (with
+  a from → to summary), and post-approval edits (with a field-level
+  before/after summary) — newest first, with the actor's name and a
+  formatted timestamp. `summarizeChanges()`'s branching logic has 9
+  dedicated unit tests.
 - **Test coverage gap vs. the spec's Testing section**: unit tests exist
-  for calculations, DB-row mapping, CSV safety, PDF generation, the
-  suggestions rules engine, and role-gating (`assertRole`, every role
-  constant list, and CSV import validation) — 86 tests. Still not built: integration tests for the
-  full create→send→approve→won workflow, responsive UI tests,
-  empty/failure-state tests, and CSV *import* validation tests (there's no
-  import feature to test). These specifically need a real browser against
-  a real signed-in session, which this sandbox's network policy blocks
-  (see above) — the role-gating logic itself is now tested at the unit
-  level, but not the end-to-end "a reporting_readonly user literally
-  cannot click Send" browser-level guarantee.
+  for calculations, DB-row mapping, CSV safety (both export-injection-
+  safety and import validation/parsing), PDF generation, the suggestions
+  rules engine, role-gating (`assertRole`, every role constant list), and
+  the audit-log summary formatter — 95 tests. Still not built:
+  integration tests for the full create→send→approve→won workflow,
+  responsive UI tests, and empty/failure-state tests. These specifically
+  need a real browser against a real signed-in session, which this
+  sandbox's network policy blocks (see above) — the role-gating logic
+  itself is now tested at the unit level, but not the end-to-end "a
+  reporting_readonly user literally cannot click Send" browser-level
+  guarantee.
 - **No e-signature** — the PDF has a blank "approved by (print name)" /
   date line, matching the spec's stated MVP acceptance.
 

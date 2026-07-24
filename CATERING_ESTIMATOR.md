@@ -113,11 +113,12 @@ npm test          # run once
 npm run test:watch
 ```
 
-86 tests across: the calculation engine, the DB-row mapping layer, CSV
-injection-safety, PDF generation (real PDF bytes, real assertion that
-internal cost/margin never appears in the customer proposal's bytes),
-role-gating (`assertRole` and every role constant list), and the
-suggestions rules engine. See Known Limitations in the completion report
+95 tests across: the calculation engine, the DB-row mapping layer, CSV
+injection-safety (export and import), PDF generation (real PDF bytes, real
+assertion that internal cost/margin never appears in the customer
+proposal's bytes), role-gating (`assertRole` and every role constant
+list), the suggestions rules engine, and the audit-log summary formatter.
+See Known Limitations in the completion report
 for what test coverage *doesn't* exist yet (integration/workflow tests,
 end-to-end/browser-level permission enforcement, responsive UI tests) —
 the plan explicitly staged "finish create-to-PDF before pipeline/AI," and
