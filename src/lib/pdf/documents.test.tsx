@@ -56,6 +56,8 @@ const estimate: EstimateDetail = {
   customer_facing_notes: "Thank you for considering us!",
   approved_by: null,
   approved_at: null,
+  chef_reviewed_at: null,
+  chef_reviewed_by: null,
   created_by: null,
   updated_by: null,
   created_at: "2026-01-01T00:00:00Z",

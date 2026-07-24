@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireProfile } from "@/lib/auth/profile";
+import { CHEF_REVIEW_ROLES, requireProfile } from "@/lib/auth/profile";
 import { getAuditLogForEstimate, getEstimate, getVersionHistory, listContactsForCustomer, listOrgConfig } from "@/lib/data/catering";
 import { computeEstimateSummary } from "@/lib/calculations/estimateSummary";
 import { CATEGORY_LABELS, MENU_PACKAGE_CATEGORIES, BEVERAGE_CATEGORIES, RENTALS_LOGISTICS_CATEGORIES, STATUS_LABELS } from "@/lib/constants/catering";
 import { RunningTotalSidebar } from "@/components/estimator/RunningTotalSidebar";
 import { EventDetailsSection } from "@/components/estimator/EventDetailsSection";
 import { GuestCountHistory } from "@/components/estimator/GuestCountHistory";
+import { FeasibilityReviewSection } from "@/components/estimator/FeasibilityReviewSection";
 import { AuditLogPanel } from "@/components/estimator/AuditLogPanel";
 import { LineItemsSection } from "@/components/estimator/LineItemsSection";
 import { PackageTemplatePicker } from "@/components/estimator/PackageTemplatePicker";
@@ -144,6 +145,15 @@ export default async function EstimateBuilderPage({ params }: { params: Promise<
           <NotesSection estimate={estimate} disabled={!isEditable} />
 
           <SuggestionsPanel suggestions={suggestions} />
+
+          {config.settings?.chef_review_required && (
+            <FeasibilityReviewSection
+              estimateId={estimate.id}
+              chefReviewedAt={estimate.chef_reviewed_at}
+              canReview={CHEF_REVIEW_ROLES.includes(profile.role)}
+              disabled={!isEditable}
+            />
+          )}
 
           <StatusActions estimateId={estimate.id} status={estimate.status} />
         </div>

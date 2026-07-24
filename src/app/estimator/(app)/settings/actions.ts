@@ -201,6 +201,7 @@ export async function updateChargeSettings(_prev: SettingsActionState, formData:
       default_profit_target_percent: formData.get("defaultProfitTargetPercent")
         ? Number(formData.get("defaultProfitTargetPercent")) / 100
         : null,
+      chef_review_required: formData.get("chefReviewRequired") === "on",
     })
     .eq("organization_id", profile.organizationId);
   if (error) return { error: error.message };

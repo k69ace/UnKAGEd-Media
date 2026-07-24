@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { assertRole, requireProfile, ADMIN_ROLES, APPROVER_ROLES, ESTIMATE_WRITE_ROLES } from "@/lib/auth/profile";
+import { assertRole, requireProfile, ADMIN_ROLES, APPROVER_ROLES, CHEF_REVIEW_ROLES, ESTIMATE_WRITE_ROLES } from "@/lib/auth/profile";
 import { computeEstimateSummary } from "@/lib/calculations/estimateSummary";
 import type { Database } from "@/lib/supabase/types";
 
@@ -689,6 +689,14 @@ export async function changeEstimateStatus(estimateId: string, newStatus: Estima
       if (!contact?.email && !contact?.phone) {
         return { error: "The selected contact needs an email or phone number before sending." };
       }
+      const { data: sendSettings } = await supabase
+        .from("organization_settings")
+        .select("chef_review_required")
+        .eq("organization_id", estimate.organization_id)
+        .single();
+      if (sendSettings?.chef_review_required && !estimate.chef_reviewed_at) {
+        return { error: "This estimate needs a chef review before it can be sent -- see Feasibility Review below." };
+      }
     }
 
     if (newStatus === "approved") {
@@ -743,5 +751,31 @@ export async function changeEstimateStatus(estimateId: string, newStatus: Estima
     return {};
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Failed to change status." };
+  }
+}
+
+/**
+ * Records a feasibility review by a chef (or an admin standing in for one).
+ * Only meaningful when the org has organization_settings.chef_review_required
+ * on -- changeEstimateStatus reads chef_reviewed_at to gate Send in that
+ * case -- but it's harmless to record regardless, so there's no need to
+ * branch on the setting here.
+ */
+export async function markChefReviewed(estimateId: string): Promise<{ error?: string }> {
+  try {
+    const profile = await requireProfile();
+    assertRole(profile, CHEF_REVIEW_ROLES);
+    const supabase = await createClient();
+
+    const { error } = await supabase
+      .from("catering_estimates")
+      .update({ chef_reviewed_at: new Date().toISOString(), chef_reviewed_by: profile.id, updated_by: profile.id })
+      .eq("id", estimateId);
+    if (error) throw error;
+
+    revalidateEstimate(estimateId);
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Failed to record chef review." };
   }
 }

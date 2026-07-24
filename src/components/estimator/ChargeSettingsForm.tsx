@@ -101,6 +101,10 @@ export function ChargeSettingsForm({ settings, taxRules }: { settings: OrgSettin
 
       <fieldset className="flex flex-col gap-3">
         <legend className="text-sm font-medium">Approval &amp; margin targets</legend>
+        <label className="flex items-center gap-2">
+          <input type="checkbox" name="chefReviewRequired" defaultChecked={settings.chef_review_required} />
+          Require chef feasibility review before sending
+        </label>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Field label="Approval required above ($)">
             <input

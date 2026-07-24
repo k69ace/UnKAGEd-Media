@@ -113,7 +113,7 @@ npm test          # run once
 npm run test:watch
 ```
 
-95 tests across: the calculation engine, the DB-row mapping layer, CSV
+96 tests across: the calculation engine, the DB-row mapping layer, CSV
 injection-safety (export and import), PDF generation (real PDF bytes, real
 assertion that internal cost/margin never appears in the customer
 proposal's bytes), role-gating (`assertRole` and every role constant

@@ -212,6 +212,7 @@ export interface Database {
           internal_notes: string | null; customer_facing_notes: string | null;
           approved_by: string | null; approved_at: string | null; created_by: string | null;
           updated_by: string | null; created_at: string; updated_at: string;
+          chef_reviewed_at: string | null; chef_reviewed_by: string | null;
         },
         {
           id?: string; organization_id: string; location_id?: string | null; customer_id: string;
@@ -226,6 +227,7 @@ export interface Database {
           internal_notes?: string | null; customer_facing_notes?: string | null;
           approved_by?: string | null; approved_at?: string | null; created_by?: string | null;
           updated_by?: string | null; created_at?: string; updated_at?: string;
+          chef_reviewed_at?: string | null; chef_reviewed_by?: string | null;
         },
         Partial<{
           id: string; organization_id: string; location_id: string | null; customer_id: string;
@@ -240,6 +242,7 @@ export interface Database {
           internal_notes: string | null; customer_facing_notes: string | null;
           approved_by: string | null; approved_at: string | null; created_by: string | null;
           updated_by: string | null; created_at: string; updated_at: string;
+          chef_reviewed_at: string | null; chef_reviewed_by: string | null;
         }>
       >;
       catering_estimate_line_items: Table<

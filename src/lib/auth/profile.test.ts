@@ -4,6 +4,7 @@ import {
   PermissionError,
   ADMIN_ROLES,
   APPROVER_ROLES,
+  CHEF_REVIEW_ROLES,
   ESTIMATE_WRITE_ROLES,
   READ_ONLY_ROLE,
   type CurrentProfile,
@@ -58,6 +59,12 @@ describe("role gating matches the product's access model", () => {
 
   it("catering_admin and manager_owner are the only admin roles (Settings access)", () => {
     expect(new Set(ADMIN_ROLES)).toEqual(new Set(["catering_admin", "manager_owner"]));
+  });
+
+  it("chef, catering_admin, and manager_owner can mark an estimate chef-reviewed; sales_manager cannot", () => {
+    expect(new Set(CHEF_REVIEW_ROLES)).toEqual(new Set(["chef", "catering_admin", "manager_owner"]));
+    expect(CHEF_REVIEW_ROLES).not.toContain("sales_manager");
+    expect(CHEF_REVIEW_ROLES).not.toContain(READ_ONLY_ROLE);
   });
 
   it("every role can either write estimates, is the read-only role, or is an admin role -- no role falls through the cracks", () => {

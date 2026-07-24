@@ -92,10 +92,16 @@ If neither threshold is met, any estimate-write role can move an estimate
 to Approved themselves — the gate is opt-in per organization, not
 mandatory.
 
-**Chef review**: `organization_settings.chef_review_required` exists in the
-database but isn't enforced anywhere in the app yet (no gating on
-Approved/Send). Treat it as a documented placeholder, not a working
-feature — see Known Limitations in the completion report.
+**Chef review**: turn on "Require chef feasibility review before sending"
+and a **Feasibility Review** section appears on every estimate (below
+Suggestions, above Review & Send) until a chef, catering admin, or
+manager/owner clicks "Mark reviewed" there. While required and
+unreviewed, **Send is blocked** with a message pointing back to that
+section — sales_manager can build the estimate but can't push it past
+that gate alone. The review resets on a new version (editing an
+approved+ estimate clones a fresh draft, per the version-on-edit rule
+above), so a materially changed estimate always gets a fresh look before
+it goes out again. This does not gate Approve — only Send.
 
 ## Event Types, Service Styles &amp; Staffing Roles
 

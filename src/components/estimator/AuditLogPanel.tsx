@@ -4,6 +4,7 @@ const ACTION_LABELS: Record<string, string> = {
   created: "Estimate created",
   status_changed: "Status changed",
   post_approval_edit: "Edited after approval",
+  chef_reviewed: "Feasibility review completed",
 };
 
 export function summarizeChanges(action: string, changes: unknown): string | null {

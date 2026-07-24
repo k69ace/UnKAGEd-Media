@@ -68,3 +68,5 @@ export const ESTIMATE_WRITE_ROLES: AppRole[] = [
   "catering_admin",
   "manager_owner",
 ];
+/** Who can mark an estimate as feasibility-reviewed (see chef_review_required). */
+export const CHEF_REVIEW_ROLES: AppRole[] = ["chef", "catering_admin", "manager_owner"];

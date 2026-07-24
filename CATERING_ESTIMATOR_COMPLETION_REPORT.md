@@ -18,7 +18,7 @@ settings/seed/docs.
   deprecated `middleware.ts` in favor of `proxy.ts`. Migrated accordingly.
   Both the initial skepticism and the later correction are recorded in the
   audit file.
-- **Data model** — 7 migrations (`supabase/migrations/`), applied to a
+- **Data model** — 8 migrations (`supabase/migrations/`), applied to a
   dedicated Supabase project (`unkaged-catering-estimator`): organizations/
   locations/profiles/roles, customers/contacts, tax rules + org settings +
   event types/service styles/staffing roles, package templates, the
@@ -82,7 +82,7 @@ settings/seed/docs.
 ## Verification performed
 
 - `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm test`
-  (95 tests) all clean as of the final commit on this branch.
+  (96 tests) all clean as of the final commit on this branch.
 - Schema/RLS verified live against the Supabase project via SQL Editor
   queries (not just "the migration ran without an error").
 - A real browser smoke test against the dev server (Playwright) caught and
@@ -132,6 +132,15 @@ select prosrc from pg_proc where proname = 'current_organization_id';
 -- should contain "and is_active = true" if migration 007 is applied
 ```
 
+**Migration 008 (`chef_review.sql`) is written and committed with the same
+unconfirmed status** — it adds `chef_reviewed_at`/`chef_reviewed_by` to
+`catering_estimates` and extends the audit trigger to log a
+`chef_reviewed` action. Until it's applied, the Settings checkbox and the
+Feasibility Review section will error against the live database (missing
+columns) even though the application code and hand-written types are
+already updated for it. Apply it the same way as 005–007: paste the file's
+contents into the Supabase SQL Editor.
+
 ## Known Limitations
 
 - **No drag-and-drop** for line-item reordering or pipeline status
@@ -159,8 +168,17 @@ select prosrc from pg_proc where proname = 'current_organization_id';
   taxability, tax rule), activate/deactivate. This closes the last of the
   four config-list gaps (event types, service styles, staffing roles,
   package templates all now manageable from `/estimator/settings`).
-- **`chef_review_required` is an unenforced database field.** No
-  feasibility-review workflow step gates Send or Approve today.
+- **`chef_review_required` is now a real gate, not a placeholder field.**
+  Settings has a checkbox ("Require chef feasibility review before
+  sending"); when on, a new "Feasibility Review" section appears on the
+  estimate detail page and `changeEstimateStatus` blocks the transition to
+  Sent until a chef/catering_admin/manager_owner records a review
+  (`markChefReviewed`, gated by a new `CHEF_REVIEW_ROLES` list). The
+  review is tracked per-estimate (`chef_reviewed_at`/`chef_reviewed_by`,
+  migration `20260724000001_chef_review.sql`), resets on every new
+  version (so a materially edited estimate needs a fresh look), and shows
+  up in the Activity Log via the audit trigger's new `chef_reviewed`
+  action. Deliberately does **not** gate Approve — only Send.
 - **CSV import now exists** for menu/pricing catalogs (Settings → Package
   Templates → "Import a template from CSV"): category/description/
   quantity/unit/price/cost/taxable/tax-rule-name columns, whole-file
@@ -195,10 +213,11 @@ select prosrc from pg_proc where proname = 'current_organization_id';
 - **Test coverage gap vs. the spec's Testing section**: unit tests exist
   for calculations, DB-row mapping, CSV safety (both export-injection-
   safety and import validation/parsing), PDF generation, the suggestions
-  rules engine, role-gating (`assertRole`, every role constant list), and
-  the audit-log summary formatter — 95 tests. Still not built:
-  integration tests for the full create→send→approve→won workflow,
-  responsive UI tests, and empty/failure-state tests. These specifically
+  rules engine, role-gating (`assertRole`, every role constant list
+  including the chef-review roles), and the audit-log summary formatter —
+  96 tests. Still not built: integration tests for the full
+  create→send→approve→won workflow, responsive UI tests, and
+  empty/failure-state tests. These specifically
   need a real browser against a real signed-in session, which this
   sandbox's network policy blocks (see above) — the role-gating logic
   itself is now tested at the unit level, but not the end-to-end "a
