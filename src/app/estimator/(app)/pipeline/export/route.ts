@@ -15,6 +15,8 @@ export async function GET(request: Request) {
     dateTo: url.searchParams.get("dateTo") || undefined,
     guestCountMin: url.searchParams.get("guestCountMin") ? Number(url.searchParams.get("guestCountMin")) : undefined,
     guestCountMax: url.searchParams.get("guestCountMax") ? Number(url.searchParams.get("guestCountMax")) : undefined,
+    locationId: url.searchParams.get("locationId") || undefined,
+    ownerId: url.searchParams.get("ownerId") || undefined,
   };
 
   const [estimates, config] = await Promise.all([
@@ -26,7 +28,7 @@ export async function GET(request: Request) {
   const serviceCharge = serviceChargeConfigFromSettings(config.settings);
   const gratuity = gratuityConfigFromSettings(config.settings);
 
-  const headers = ["Customer", "Status", "Event date", "Guest count", "Value", "Internal cost", "Margin $", "Margin %", "Owner", "Created at"];
+  const headers = ["Customer", "Status", "Event date", "Guest count", "Value", "Internal cost", "Margin $", "Margin %", "Owner", "Location", "Created at"];
   const rows = estimates.map((e) => {
     const calcLineItems = e.catering_estimate_line_items.map(toCalcLineItem);
     const calcStaffing = e.catering_estimate_staffing.map(toCalcStaffing);
@@ -51,6 +53,7 @@ export async function GET(request: Request) {
       marginDollar.toFixed(2),
       marginPercent === null ? "" : `${roundPercentForDisplay(marginPercent)}%`,
       e.created_by_profile?.full_name ?? "",
+      e.locations?.name ?? "",
       e.created_at,
     ];
   });

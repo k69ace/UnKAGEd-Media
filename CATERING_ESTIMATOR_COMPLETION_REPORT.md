@@ -171,9 +171,11 @@ select prosrc from pg_proc where proname = 'current_organization_id';
   billing-dispute scenario the spec called out.
 - **No diff view between estimate versions** — the version-history
   breadcrumb links to each version's full page, not a side-by-side diff.
-- **Pipeline filters** don't include location or sales-owner, only event
-  type/date range/guest count — reasonable for a single-location org, a
-  real gap for multi-location/multi-rep ones.
+- **Pipeline filters now include location and sales owner**, alongside
+  event type/date range/guest count — both the board and the CSV export
+  respect them, and each pipeline card shows its owner. (Location filter
+  only renders when an org actually has more than one active location,
+  to avoid a useless single-option dropdown.)
 - **No in-app audit-log viewer** — `audit_log` is populated correctly but
   only queryable via the database directly.
 - **Test coverage gap vs. the spec's Testing section**: unit tests exist

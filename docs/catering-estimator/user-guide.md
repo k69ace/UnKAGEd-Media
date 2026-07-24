@@ -105,8 +105,9 @@ cost, margin, owner, and created date.
 
 Status columns (Draft → Sent → Approved → Won/Lost), KPI cards (open
 pipeline value, win rate, average deal size, approved events in the next
-7 days), and filters by event type/date range/guest count. Change an
-estimate's status directly from its card using the dropdown — that's the
-same status logic as the Review & Send buttons on the estimate itself, so
+7 days), and filters by event type/location/sales owner/date range/guest
+count. Change an estimate's status directly from its card using the
+dropdown — that's the same status logic as the Review & Send buttons on
+the estimate itself, so
 the same validation rules apply (e.g. you still can't mark something
 Approved past the org's threshold unless you have the right role).

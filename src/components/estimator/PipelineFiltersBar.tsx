@@ -2,15 +2,21 @@
 
 export function PipelineFiltersBar({
   eventTypes,
+  locations,
+  owners,
   defaults,
 }: {
   eventTypes: { id: string; name: string }[];
+  locations: { id: string; name: string }[];
+  owners: { id: string; full_name: string }[];
   defaults: {
     eventTypeId?: string;
     dateFrom?: string;
     dateTo?: string;
     guestCountMin?: string;
     guestCountMax?: string;
+    locationId?: string;
+    ownerId?: string;
   };
 }) {
   const inputClass = "rounded-md border border-foreground/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-foreground/40";
@@ -24,6 +30,30 @@ export function PipelineFiltersBar({
           {eventTypes.map((t) => (
             <option key={t.id} value={t.id}>
               {t.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      {locations.length > 1 && (
+        <label className="flex flex-col gap-1">
+          <span className="text-xs text-foreground/60">Location</span>
+          <select name="locationId" defaultValue={defaults.locationId ?? ""} className={inputClass}>
+            <option value="">All</option>
+            {locations.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      <label className="flex flex-col gap-1">
+        <span className="text-xs text-foreground/60">Sales owner</span>
+        <select name="ownerId" defaultValue={defaults.ownerId ?? ""} className={inputClass}>
+          <option value="">All</option>
+          {owners.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.full_name}
             </option>
           ))}
         </select>

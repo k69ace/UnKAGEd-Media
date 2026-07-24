@@ -31,6 +31,8 @@ export type PipelineEstimateRow = Pick<
 > & {
   customers: { name: string; company_name: string | null } | null;
   event_types: { name: string } | null;
+  locations: { name: string } | null;
+  created_by_profile: { full_name: string } | null;
   catering_estimate_line_items: Pick<LineItemRow, "id" | "category" | "quantity" | "unit_price" | "unit_cost" | "is_taxable" | "tax_rule_id">[];
 };
 
@@ -39,6 +41,7 @@ export type ExportEstimateRow = Pick<
   "id" | "status" | "event_date" | "guest_count_estimated" | "guest_count_guaranteed" | "discount_amount" | "created_at"
 > & {
   customers: { name: string; company_name: string | null } | null;
+  locations: { name: string } | null;
   created_by_profile: { full_name: string } | null;
   catering_estimate_line_items: Pick<LineItemRow, "id" | "category" | "quantity" | "unit_price" | "unit_cost" | "is_taxable" | "tax_rule_id">[];
   catering_estimate_staffing: Pick<StaffingRow, "quantity" | "hours" | "rate_per_hour">[];
@@ -211,6 +214,8 @@ export interface PipelineFilters {
   dateTo?: string;
   guestCountMin?: number;
   guestCountMax?: number;
+  locationId?: string;
+  ownerId?: string;
 }
 
 export async function listEstimatesForPipeline(organizationId: string, filters: PipelineFilters = {}): Promise<PipelineEstimateRow[]> {
@@ -221,6 +226,8 @@ export async function listEstimatesForPipeline(organizationId: string, filters: 
       `id, status, event_date, guest_count_estimated, guest_count_guaranteed, discount_amount, created_at, version, previous_version_id,
       customers(name, company_name),
       event_types(name),
+      locations(name),
+      created_by_profile:profiles!created_by(full_name),
       catering_estimate_line_items(id, category, quantity, unit_price, unit_cost, is_taxable, tax_rule_id)`,
     )
     .eq("organization_id", organizationId)
@@ -232,6 +239,8 @@ export async function listEstimatesForPipeline(organizationId: string, filters: 
   if (filters.dateTo) query = query.lte("event_date", filters.dateTo);
   if (filters.guestCountMin != null) query = query.gte("guest_count_estimated", filters.guestCountMin);
   if (filters.guestCountMax != null) query = query.lte("guest_count_estimated", filters.guestCountMax);
+  if (filters.locationId) query = query.eq("location_id", filters.locationId);
+  if (filters.ownerId) query = query.eq("created_by", filters.ownerId);
 
   const { data, error } = await query;
   if (error) throw error;
@@ -245,6 +254,7 @@ export async function listEstimatesForExport(organizationId: string, filters: Pi
     .select(
       `id, status, event_date, guest_count_estimated, guest_count_guaranteed, discount_amount, created_at,
       customers(name, company_name),
+      locations(name),
       created_by_profile:profiles!created_by(full_name),
       catering_estimate_line_items(id, category, quantity, unit_price, unit_cost, is_taxable, tax_rule_id),
       catering_estimate_staffing(quantity, hours, rate_per_hour)`,
@@ -256,8 +266,22 @@ export async function listEstimatesForExport(organizationId: string, filters: Pi
   if (filters.eventTypeId) query = query.eq("event_type_id", filters.eventTypeId);
   if (filters.dateFrom) query = query.gte("event_date", filters.dateFrom);
   if (filters.dateTo) query = query.lte("event_date", filters.dateTo);
+  if (filters.locationId) query = query.eq("location_id", filters.locationId);
+  if (filters.ownerId) query = query.eq("created_by", filters.ownerId);
 
   const { data, error } = await query;
   if (error) throw error;
   return data as unknown as ExportEstimateRow[];
+}
+
+export async function listAllLocations(organizationId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("locations")
+    .select("id, name")
+    .eq("organization_id", organizationId)
+    .eq("is_active", true)
+    .order("name");
+  if (error) throw error;
+  return data;
 }

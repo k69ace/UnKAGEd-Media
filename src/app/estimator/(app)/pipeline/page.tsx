@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireProfile } from "@/lib/auth/profile";
-import { listEstimatesForPipeline, listOrgConfig, type PipelineFilters } from "@/lib/data/catering";
+import { listAllLocations, listEstimatesForPipeline, listOrgConfig, listOrgMembers, type PipelineFilters } from "@/lib/data/catering";
 import { calculateGrandTotal } from "@/lib/calculations/catering";
 import { toCalcLineItem, toCalcTaxRule, serviceChargeConfigFromSettings, gratuityConfigFromSettings } from "@/lib/calculations/mappers";
 import { PIPELINE_STATUSES, STATUS_LABELS } from "@/lib/constants/catering";
@@ -25,11 +25,15 @@ export default async function PipelinePage({
     dateTo: params.dateTo || undefined,
     guestCountMin: params.guestCountMin ? Number(params.guestCountMin) : undefined,
     guestCountMax: params.guestCountMax ? Number(params.guestCountMax) : undefined,
+    locationId: params.locationId || undefined,
+    ownerId: params.ownerId || undefined,
   };
 
-  const [estimates, config] = await Promise.all([
+  const [estimates, config, locations, members] = await Promise.all([
     listEstimatesForPipeline(profile.organizationId, filters),
     listOrgConfig(profile.organizationId),
+    listAllLocations(profile.organizationId),
+    listOrgMembers(profile.organizationId),
   ]);
 
   const calcTaxRules = config.taxRules.map(toCalcTaxRule);
@@ -97,12 +101,16 @@ export default async function PipelinePage({
       <div className="mb-6">
         <PipelineFiltersBar
           eventTypes={config.eventTypes}
+          locations={locations}
+          owners={members.map((m) => ({ id: m.id, full_name: m.full_name }))}
           defaults={{
             eventTypeId: params.eventTypeId,
             dateFrom: params.dateFrom,
             dateTo: params.dateTo,
             guestCountMin: params.guestCountMin,
             guestCountMax: params.guestCountMax,
+            locationId: params.locationId,
+            ownerId: params.ownerId,
           }}
         />
       </div>
@@ -134,6 +142,7 @@ export default async function PipelinePage({
                     <p className="text-xs text-foreground/50">
                       {item.guest_count_guaranteed ?? item.guest_count_estimated ?? "—"} guests · v{item.version}
                     </p>
+                    {item.created_by_profile && <p className="text-xs text-foreground/40">{item.created_by_profile.full_name}</p>}
                     <div className="mt-2">
                       <PipelineStatusSelect estimateId={item.id} status={item.status} />
                     </div>
