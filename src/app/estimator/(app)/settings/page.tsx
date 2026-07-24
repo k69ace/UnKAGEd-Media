@@ -7,12 +7,14 @@ import {
   listAllTaxRules,
   listOrgConfig,
   listOrgMembers,
+  listPendingInvites,
 } from "@/lib/data/catering";
 import { TaxRulesManager } from "@/components/estimator/TaxRulesManager";
 import { ChargeSettingsForm } from "@/components/estimator/ChargeSettingsForm";
 import { NamedListManager } from "@/components/estimator/NamedListManager";
 import { StaffingRolesManager } from "@/components/estimator/StaffingRolesManager";
 import { TeamManager } from "@/components/estimator/TeamManager";
+import { InviteManager } from "@/components/estimator/InviteManager";
 import { PackageTemplateManager } from "@/components/estimator/PackageTemplateManager";
 import { PackageTemplateCsvImport } from "@/components/estimator/PackageTemplateCsvImport";
 import { createEventType, createServiceStyle, toggleEventTypeActive, toggleServiceStyleActive } from "./actions";
@@ -28,15 +30,17 @@ export default async function SettingsPage() {
     );
   }
 
-  const [config, allTaxRules, allEventTypes, allServiceStyles, allStaffingRoles, members, allPackageTemplates] = await Promise.all([
-    listOrgConfig(profile.organizationId),
-    listAllTaxRules(profile.organizationId),
-    listAllEventTypes(profile.organizationId),
-    listAllServiceStyles(profile.organizationId),
-    listAllStaffingRoles(profile.organizationId),
-    listOrgMembers(profile.organizationId),
-    listAllPackageTemplates(profile.organizationId),
-  ]);
+  const [config, allTaxRules, allEventTypes, allServiceStyles, allStaffingRoles, members, allPackageTemplates, pendingInvites] =
+    await Promise.all([
+      listOrgConfig(profile.organizationId),
+      listAllTaxRules(profile.organizationId),
+      listAllEventTypes(profile.organizationId),
+      listAllServiceStyles(profile.organizationId),
+      listAllStaffingRoles(profile.organizationId),
+      listOrgMembers(profile.organizationId),
+      listAllPackageTemplates(profile.organizationId),
+      listPendingInvites(profile.organizationId),
+    ]);
 
   return (
     <div className="flex flex-col gap-10">
@@ -102,6 +106,18 @@ export default async function SettingsPage() {
       </section>
 
       <section>
+        <h2 className="text-base font-semibold">Invite a teammate</h2>
+        <p className="mt-1 text-sm text-foreground/60">
+          Generates a link that joins your organization directly, with the role you pick — no more separate
+          organization to merge in by hand. Leave email blank for an open link anyone can use; set it to restrict
+          the link to that address. Links expire after 7 days and can be revoked any time before they&apos;re used.
+        </p>
+        <div className="mt-4">
+          <InviteManager invites={pendingInvites} />
+        </div>
+      </section>
+
+      <section>
         <h2 className="text-base font-semibold">Team</h2>
         <p className="mt-1 text-sm text-foreground/60">
           Change a teammate&apos;s role, or deactivate someone who&apos;s left — a deactivated account loses access
@@ -125,14 +141,6 @@ export default async function SettingsPage() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-dashed border-foreground/15 p-4 text-sm text-foreground/60">
-        <p className="font-medium text-foreground/80">Not yet manageable from this page</p>
-        <p className="mt-1">
-          There&apos;s still no invite flow — a new teammate&apos;s sign-up creates its own separate organization,
-          and merging that into yours requires a direct database edit (see the admin guide); the Team list above
-          only manages role/active status for people already in your organization.
-        </p>
-      </section>
     </div>
   );
 }

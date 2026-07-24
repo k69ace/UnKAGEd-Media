@@ -18,7 +18,7 @@ settings/seed/docs.
   deprecated `middleware.ts` in favor of `proxy.ts`. Migrated accordingly.
   Both the initial skepticism and the later correction are recorded in the
   audit file.
-- **Data model** — 8 migrations (`supabase/migrations/`), applied to a
+- **Data model** — 9 migrations (`supabase/migrations/`), applied to a
   dedicated Supabase project (`unkaged-catering-estimator`): organizations/
   locations/profiles/roles, customers/contacts, tax rules + org settings +
   event types/service styles/staffing roles, package templates, the
@@ -82,7 +82,7 @@ settings/seed/docs.
 ## Verification performed
 
 - `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm test`
-  (119 tests) all clean as of the final commit on this branch.
+  (127 tests) all clean as of the final commit on this branch.
 - Schema/RLS verified live against the Supabase project via SQL Editor
   queries (not just "the migration ran without an error").
 - A real browser smoke test against the dev server (Playwright) caught and
@@ -141,6 +141,14 @@ columns) even though the application code and hand-written types are
 already updated for it. Apply it the same way as 005–007: paste the file's
 contents into the Supabase SQL Editor.
 
+**Migration 009 (`invites.sql`) is written and committed with the same
+unconfirmed status** — it adds the `invites` table and redefines
+`handle_new_user()` to honor an invite token. Until it's applied, the
+Settings "Invite a teammate" form will error against the live database
+(missing table), and `/estimator/login?invite=...` links will always show
+"invite link isn't valid" since `getInvitePreview()` queries a table that
+doesn't exist yet. Apply it the same way as 005–008.
+
 ## Known Limitations
 
 - **No drag-and-drop** for line-item reordering or pipeline status
@@ -154,15 +162,32 @@ contents into the Supabase SQL Editor.
 - **In-app role management now exists** (Settings → Team: role dropdown +
   active/deactivated toggle per teammate, with server-side protection
   against deactivating yourself or removing the org's last admin).
-  **No invite flow still** — a new sign-up always creates its own
-  organization; merging a stray one into an existing org still requires a
-  direct `profiles.organization_id` edit (documented in the admin guide).
   Deactivation is a real access control, not cosmetic: migration 007
   (`enforce_profile_active`) redefines `current_organization_id()` and
   `current_app_role()` to require `is_active = true`, so every RLS policy
   in the schema fails closed for a deactivated profile. **This migration
   was written but not yet confirmed applied** — see the verification note
   below.
+- **Invite-teammate flow now exists, closing the "always creates its own
+  org" gap.** Settings → Team has an "Invite a teammate" section
+  (`InviteManager`) that generates a `/estimator/login?invite=<token>`
+  link for a chosen role (optionally locked to one email). Opening it
+  shows "You've been invited to join {org} as {role}" and signing up
+  there joins that organization directly with that role — no separate org
+  gets created and no manual `profiles.organization_id` edit is needed
+  (that workaround still exists in the admin guide for pre-existing
+  stray sign-ups). Migration `20260724000002_invites.sql` adds the
+  `invites` table and teaches `handle_new_user()` to honor a valid,
+  unexpired, unrevoked, not-yet-accepted token instead of always creating
+  a new org — same unconfirmed-application-status caveat as migrations
+  007 and 008 (see below). Pre-auth token lookup
+  (`src/lib/data/invites.ts`) is the module's first real use of
+  `createServiceRoleClient()`, documented as the deliberate exception it
+  is: the caller has no session yet, and invites RLS intentionally grants
+  no anonymous select. The pure validity rules (`src/lib/invites/
+  inviteRules.ts` — expiry/revocation/already-accepted, and email
+  matching when an invite is locked to one address) have 8 dedicated unit
+  tests.
 - **Package templates now have a Settings UI** too — create a template,
   add/remove its line items (category, description, qty, price, cost,
   taxability, tax rule), activate/deactivate. This closes the last of the
@@ -221,9 +246,9 @@ contents into the Supabase SQL Editor.
   for calculations, DB-row mapping, CSV safety (both export-injection-
   safety and import validation/parsing), PDF generation, the suggestions
   rules engine, role-gating (`assertRole`, every role constant list
-  including the chef-review roles), the audit-log summary formatter, and
-  the version-diff matching logic — 119 tests. **Empty/failure-state UI
-  tests now exist too**, at the component level: React Testing Library +
+  including the chef-review roles), the audit-log summary formatter, the
+  version-diff matching logic, and the invite-validity rules — 127 tests.
+  **Empty/failure-state UI tests now exist too**, at the component level: React Testing Library +
   jsdom were added (no live Supabase or browser required) and cover
   `SuggestionsPanel` (renders nothing with zero suggestions),
   `GuestCountHistory` (renders nothing at ≤1 entries — a single row isn't

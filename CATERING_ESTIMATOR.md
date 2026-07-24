@@ -62,6 +62,9 @@ src/lib/
   supabase/                 Client/server Supabase clients, hand-written DB types
   auth/profile.ts           requireProfile(), assertRole(), role constants
   data/catering.ts          All read queries (server-only)
+  data/invites.ts           Pre-auth invite lookup/validation — the one place
+                             this module uses the service-role client, and why
+  invites/inviteRules.ts    Pure invite-validity rules (expiry/revocation/email match)
   calculations/catering.ts  Pure calculation engine — no I/O, fully unit-tested
   calculations/mappers.ts   DB row -> calculation-engine input shape
   calculations/estimateSummary.ts  Wires a DB estimate through the engine
@@ -88,16 +91,20 @@ schema and replace it wholesale** the next time
 `generate_typescript_types` is reachable, rather than continuing to
 hand-edit it — the file's own header comment says the same thing.
 
-**Why no service-role usage**: every write goes through the authenticated
-user's own Supabase session and is authorized by Row Level Security
-policies (see `supabase/migrations/*`) plus an application-layer
+**Why almost no service-role usage**: every write goes through the
+authenticated user's own Supabase session and is authorized by Row Level
+Security policies (see `supabase/migrations/*`) plus an application-layer
 `assertRole()` check in each Server Action. The audit log
 (`audit_log` table) is written only by `SECURITY DEFINER` Postgres trigger
-functions, not by application code with elevated privileges — so there was
-never a need to wire up `SUPABASE_SERVICE_ROLE_KEY` for this module's
-current feature set. `src/lib/supabase/server.ts` has a
-`createServiceRoleClient()` ready for the day something genuinely needs to
-bypass RLS (e.g. a cross-organization admin report).
+functions, not by application code with elevated privileges. The one
+deliberate exception is `src/lib/data/invites.ts`: validating an invite
+token on the sign-up page happens before any session exists, so there's
+no authenticated request to scope RLS to — invites RLS intentionally
+grants no anonymous select, and `createServiceRoleClient()`
+(`src/lib/supabase/server.ts`) is used for exactly that one read/validate
+path, nowhere else. Treat any other proposed use of it as suspect until
+it clears the same bar: no session available, not just "RLS is
+inconvenient here."
 
 ## Calculation model
 
@@ -117,13 +124,14 @@ npm test          # run once
 npm run test:watch
 ```
 
-119 tests across: the calculation engine, the DB-row mapping layer, CSV
+127 tests across: the calculation engine, the DB-row mapping layer, CSV
 injection-safety (export and import), PDF generation (real PDF bytes, real
 assertion that internal cost/margin never appears in the customer
 proposal's bytes), role-gating (`assertRole` and every role constant
 list), the suggestions rules engine, the audit-log summary formatter, the
-version-diff matching logic, and component-level empty/failure-state
-rendering (React Testing Library + jsdom — `SuggestionsPanel`,
+version-diff matching logic, invite-validity rules (expiry/revocation/
+email-matching), and component-level empty/failure-state rendering
+(React Testing Library + jsdom — `SuggestionsPanel`,
 `GuestCountHistory`, `LineItemsSection`, `StatusActions`; server actions
 imported by client components are mocked via `vi.mock` rather than
 exercised for real, since they need a live Supabase session). See Known

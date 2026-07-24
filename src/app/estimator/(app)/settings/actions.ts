@@ -1,5 +1,7 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { assertRole, requireProfile, ADMIN_ROLES } from "@/lib/auth/profile";
@@ -287,6 +289,56 @@ export async function toggleMemberActive(memberId: string, isActive: boolean): P
     .from("profiles")
     .update({ is_active: isActive })
     .eq("id", memberId)
+    .eq("organization_id", profile.organizationId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+export interface CreateInviteResult {
+  error?: string;
+  link?: string;
+}
+
+export async function createInvite(_prev: CreateInviteResult, formData: FormData): Promise<CreateInviteResult> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const email = String(formData.get("email") ?? "").trim() || null;
+  const role = String(formData.get("role") ?? "sales_manager");
+  if (!VALID_ROLES.includes(role as AppRole)) return { error: "Not a valid role." };
+
+  const token = randomUUID().replace(/-/g, "") + randomUUID().replace(/-/g, "");
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("invites").insert({
+    organization_id: profile.organizationId,
+    email,
+    role: role as AppRole,
+    token,
+    created_by: profile.id,
+  });
+  if (error) return { error: error.message };
+
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const origin = host ? `${proto}://${host}` : "";
+
+  revalidatePath("/estimator/settings");
+  return { link: `${origin}/estimator/login?invite=${token}` };
+}
+
+export async function revokeInvite(inviteId: string): Promise<{ error?: string }> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("invites")
+    .update({ revoked_at: new Date().toISOString() })
+    .eq("id", inviteId)
     .eq("organization_id", profile.organizationId);
   if (error) return { error: error.message };
 

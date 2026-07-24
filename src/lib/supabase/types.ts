@@ -60,6 +60,23 @@ export interface Database {
           full_name: string; email: string; is_active: boolean; created_at: string; updated_at: string;
         }>
       >;
+      invites: Table<
+        {
+          id: string; organization_id: string; email: string | null; role: AppRole; token: string;
+          created_by: string | null; expires_at: string; accepted_at: string | null;
+          revoked_at: string | null; created_at: string;
+        },
+        {
+          id?: string; organization_id: string; email?: string | null; role?: AppRole; token: string;
+          created_by?: string | null; expires_at?: string; accepted_at?: string | null;
+          revoked_at?: string | null; created_at?: string;
+        },
+        Partial<{
+          id: string; organization_id: string; email: string | null; role: AppRole; token: string;
+          created_by: string | null; expires_at: string; accepted_at: string | null;
+          revoked_at: string | null; created_at: string;
+        }>
+      >;
       customers: Table<
         {
           id: string; organization_id: string; name: string; company_name: string | null;

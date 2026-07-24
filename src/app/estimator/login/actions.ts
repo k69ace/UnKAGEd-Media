@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { validateInviteForSignup } from "@/lib/data/invites";
 
 export interface AuthActionState {
   error: string | null;
@@ -24,9 +25,15 @@ export async function signUp(_prevState: AuthActionState, formData: FormData): P
   const password = String(formData.get("password") ?? "");
   const fullName = String(formData.get("fullName") ?? "");
   const organizationName = String(formData.get("organizationName") ?? "");
+  const inviteToken = String(formData.get("inviteToken") ?? "").trim() || null;
 
   if (password.length < 8) {
     return { error: "Password must be at least 8 characters.", message: null };
+  }
+
+  if (inviteToken) {
+    const validation = await validateInviteForSignup(inviteToken, email);
+    if (!validation.valid) return { error: validation.error, message: null };
   }
 
   const supabase = await createClient();
@@ -37,6 +44,7 @@ export async function signUp(_prevState: AuthActionState, formData: FormData): P
       data: {
         full_name: fullName,
         organization_name: organizationName || undefined,
+        invite_token: inviteToken || undefined,
       },
     },
   });

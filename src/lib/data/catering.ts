@@ -58,6 +58,20 @@ export async function listOrgMembers(organizationId: string) {
   return data;
 }
 
+/** Pending invites only -- accepted/revoked ones aren't shown, since an accepted invite is now just a team member. */
+export async function listPendingInvites(organizationId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("invites")
+    .select("id, email, role, token, expires_at, created_at")
+    .eq("organization_id", organizationId)
+    .is("accepted_at", null)
+    .is("revoked_at", null)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
 export interface AuditLogEntry {
   id: string;
   action: string;

@@ -20,13 +20,14 @@ const ROLE_OPTIONS: { value: AppRole; label: string }[] = [
   { value: "reporting_readonly", label: "Reporting (read-only)" },
 ];
 
-// New teammates always land here by signing up with their own new
-// organization -- there's no invite flow yet (documented in the admin
-// guide). This page is for managing whoever's already in the org: change
-// role, or deactivate someone who's left. A deactivated profile actually
-// loses access (enforced in Postgres via current_organization_id() /
+// This section manages whoever's already in the org: change role, or
+// deactivate someone who's left. A deactivated profile actually loses
+// access (enforced in Postgres via current_organization_id() /
 // current_app_role(), not just hidden in this UI) once
-// supabase/migrations/...007_enforce_profile_active.sql is applied.
+// supabase/migrations/...007_enforce_profile_active.sql is applied. New
+// teammates land here either by accepting an invite link (see
+// InviteManager, right above this section) or by signing up on their own,
+// which still creates a brand-new organization.
 export function TeamManager({ members, currentProfileId }: { members: Member[]; currentProfileId: string }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);

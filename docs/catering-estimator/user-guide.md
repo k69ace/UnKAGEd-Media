@@ -6,13 +6,15 @@ thresholds, see the [admin guide](./admin-guide.md) instead.
 
 ## Signing in
 
-Go to `/estimator/login`. If your organization already has an account,
-use **Sign in**. If you're the first person from your business, use
-**Create organization** — this creates your organization and signs you in
-as its first user (role: Sales Manager). Ask your Catering Admin or
-Manager/Owner to promote your role or invite teammates from the Supabase
-dashboard for now — there's no in-app invite flow yet (see Known
-Limitations in the completion report).
+If a Catering Admin or Manager/Owner sent you an invite link, just open it
+— it takes you straight to a sign-up form that joins their organization
+with the role they picked, with no separate steps. Otherwise, go to
+`/estimator/login`: if your organization already has an account, use
+**Sign in**; if you're the first person from your business, use **Create
+organization** — this creates your organization and signs you in as its
+first user (role: Sales Manager). From there, ask your Catering Admin or
+Manager/Owner to send you an invite link for anyone else joining, or to
+promote your role from Settings → Team.
 
 Supabase may require you to confirm your email address before you can sign
 in the first time — check your inbox for a confirmation link.

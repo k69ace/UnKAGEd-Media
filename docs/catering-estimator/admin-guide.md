@@ -17,27 +17,42 @@ Five roles exist (`profiles.role` in the database):
 | `manager_owner` | Everything catering_admin can, plus required to approve estimates that cross the $ threshold or fall below the margin target |
 | `reporting_readonly` | View pipeline and estimate history only — cannot create, edit, or change status |
 
-New sign-ups default to `sales_manager` in a brand-new organization.
-`/estimator/settings` → **Team** lists everyone already in your
-organization with a role dropdown per person and an active/deactivated
-toggle — use it to promote/demote teammates or deactivate someone who's
-left (deactivating actually revokes access immediately; it isn't cosmetic
-— see the module README's note on migration 007). You can't deactivate
-your own account or remove the organization's last admin from that page;
-both are blocked with a clear error.
+A person who signs up with no invite link defaults to `sales_manager` in
+a brand-new organization of their own.
 
-**There's still no invite-teammate flow.** A new person always creates
-their *own* organization by signing up — there's no "invite to my org"
-step. To move a stray second sign-up into your existing organization
-instead (and then manage their role normally from Team), update the
-`profiles` table directly (SQL Editor or Table Editor in the Supabase
-dashboard):
+**Inviting a teammate into your organization**: `/estimator/settings` →
+**Invite a teammate**. Pick a role, optionally an email (leave it blank
+for an open link anyone can use; set it to restrict the link to that one
+address — a sign-up attempt with a different email is rejected), and
+click "Create invite link" to get a shareable URL
+(`/estimator/login?invite=<token>`). Whoever opens it sees "You've been
+invited to join {your org} as {role}" and signs up directly into your
+organization with that role — no separate organization gets created, and
+nothing needs a direct database edit. Links expire after 7 days; the
+pending-invites list below the form lets you revoke one before it's used.
+An expired, revoked, or already-used link falls back to the normal
+sign-in/sign-up page with a clear message, rather than silently failing.
+
+If you're stuck on an old sign-up that already created its own separate
+organization (from before this flow existed, or from someone signing up
+without an invite link by mistake), you can still merge it into yours by
+hand — update the `profiles` table directly (SQL Editor or Table Editor
+in the Supabase dashboard):
 
 ```sql
 update profiles set organization_id = '<your-org-id>' where email = 'newperson@example.com';
 -- then delete the empty organization their sign-up created, if you want:
 delete from organizations where id = '<their-old-org-id>';
 ```
+
+`/estimator/settings` → **Team** lists everyone already in your
+organization (whether they joined by invite or signed up on their own)
+with a role dropdown per person and an active/deactivated toggle — use it
+to promote/demote teammates or deactivate someone who's left (deactivating
+actually revokes access immediately; it isn't cosmetic — see the module
+README's note on migration 007). You can't deactivate your own account or
+remove the organization's last admin from that page; both are blocked
+with a clear error.
 
 ## Tax Rules
 
