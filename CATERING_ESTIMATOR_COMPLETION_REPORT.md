@@ -48,9 +48,10 @@ settings/seed/docs.
   version)" action, not a silent side effect.
 - **Pipeline Board** — status columns, KPI cards (open pipeline value, win
   rate, average deal size, approved events in the next 7 days), filters
-  (event type/date range/guest count) as linkable query params, dropdown
-  status control (accessible fallback; no drag-and-drop — see Known
-  Limitations).
+  (event type/date range/guest count) as linkable query params, drag a
+  card between columns to change status (dropdown accessible fallback
+  stays on every card — see Known Limitations for the accessibility
+  rationale).
 - **Exports** — customer proposal PDF (itemized, payment schedule,
   signature/date fields, zero internal data by construction — no prop
   exists on the component for cost/margin/internal notes), internal
@@ -82,7 +83,7 @@ settings/seed/docs.
 ## Verification performed
 
 - `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm test`
-  (127 tests) all clean as of the final commit on this branch.
+  (135 tests) all clean as of the final commit on this branch.
 - Schema/RLS verified live against the Supabase project via SQL Editor
   queries (not just "the migration ran without an error").
 - A real browser smoke test against the dev server (Playwright) caught and
@@ -151,10 +152,22 @@ doesn't exist yet. Apply it the same way as 005–008.
 
 ## Known Limitations
 
-- **No drag-and-drop** for line-item reordering or pipeline status
-  changes — up/down arrows and a dropdown are the (fully accessible)
-  implementation. Spec allowed this ("accessible... non-drag fallback");
-  drag-and-drop itself is a follow-up, not shipped.
+- **Drag-and-drop now exists**, layered on top of the accessible controls
+  rather than replacing them (WCAG 2.5.7 requires a non-dragging
+  alternative for any dragging-movement interaction — up/down arrows and
+  the status dropdown stay exactly as they were). Line items: drag the
+  ⠿ handle to reorder within a section (`moveLineItem`, a new arbitrary-
+  position action alongside the existing single-step `reorderLineItem`).
+  Pipeline: drag a card between status columns (`PipelineBoard`, calling
+  the same `changeEstimateStatus` the dropdown already used, so an
+  invalid drag — e.g. skipping Send validation — surfaces the identical
+  error). **Found and fixed a real pre-existing bug** while building
+  this: `reorderLineItem` computed its swap index against the *global*
+  (whole-estimate) `sort_order` list instead of scoping to the section's
+  categories, so an arrow click in a section with interleaved categories
+  could silently swap with an item from an unrelated section instead of
+  the visually-adjacent row. Both reorder actions now take a `categories`
+  param and filter every query to it.
 - **Payment schedule** now supports a full multi-installment editor
   (amount/due date/paid per row, saved to `payment_schedule_json`, server-
   validated against the grand total, surfaced on the customer proposal
@@ -247,7 +260,9 @@ doesn't exist yet. Apply it the same way as 005–008.
   safety and import validation/parsing), PDF generation, the suggestions
   rules engine, role-gating (`assertRole`, every role constant list
   including the chef-review roles), the audit-log summary formatter, the
-  version-diff matching logic, and the invite-validity rules — 127 tests.
+  version-diff matching logic, and the invite-validity rules — 135 tests
+  (including drag-and-drop interaction tests for both `LineItemsSection`
+  and `PipelineBoard` — see the drag-and-drop bullet above).
   **Empty/failure-state UI tests now exist too**, at the component level: React Testing Library +
   jsdom were added (no live Supabase or browser required) and cover
   `SuggestionsPanel` (renders nothing with zero suggestions),

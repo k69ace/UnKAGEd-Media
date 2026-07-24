@@ -9,9 +9,9 @@ import type { Database } from "@/lib/supabase/types";
 type EstimateStatus = Database["public"]["Enums"]["estimate_status"];
 
 // Dropdown status control — the accessible fallback for the pipeline
-// board's status changes (no drag-and-drop implemented; see Known
-// Limitations). Works from a keyboard and a screen reader identically to
-// every other select on the page.
+// board's drag-and-drop status changes (see PipelineBoard). Works from a
+// keyboard and a screen reader identically to every other select on the
+// page, and is never removed just because dragging exists.
 export function PipelineStatusSelect({ estimateId, status }: { estimateId: string; status: EstimateStatus }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);

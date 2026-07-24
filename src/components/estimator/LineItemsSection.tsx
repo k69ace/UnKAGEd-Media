@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import {
   addLineItem,
   deleteLineItem,
+  moveLineItem,
   reorderLineItem,
   updateLineItem,
   type LineItemInput,
@@ -35,6 +36,7 @@ export function LineItemsSection({
   disabled: boolean;
 }) {
   const items = lineItems.filter((li) => categories.includes(li.category)).sort((a, b) => a.sort_order - b.sort_order);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
   return (
     <section className="border-b border-foreground/10 py-6">
@@ -46,6 +48,7 @@ export function LineItemsSection({
           <table className="w-full min-w-[720px] border-collapse text-sm">
             <thead>
               <tr className="border-b border-foreground/10 text-left text-xs uppercase tracking-wide text-foreground/50">
+                <th className="py-2 pr-2 font-medium" />
                 <th className="py-2 pr-2 font-medium">Category</th>
                 <th className="py-2 pr-2 font-medium">Description</th>
                 <th className="py-2 pr-2 font-medium">Qty</th>
@@ -64,10 +67,15 @@ export function LineItemsSection({
                   key={item.id}
                   estimateId={estimateId}
                   item={item}
+                  categories={categories}
                   taxRules={taxRules}
                   disabled={disabled}
                   canMoveUp={i > 0}
                   canMoveDown={i < items.length - 1}
+                  targetIndex={i}
+                  isDragOver={dragOverId === item.id}
+                  onDragOverRow={(id) => setDragOverId(id)}
+                  onDragEndRow={() => setDragOverId(null)}
                 />
               ))}
             </tbody>
@@ -83,17 +91,27 @@ export function LineItemsSection({
 function LineItemRowEditor({
   estimateId,
   item,
+  categories,
   taxRules,
   disabled,
   canMoveUp,
   canMoveDown,
+  targetIndex,
+  isDragOver,
+  onDragOverRow,
+  onDragEndRow,
 }: {
   estimateId: string;
   item: LineItemRow;
+  categories: LineItemCategory[];
   taxRules: TaxRuleOption[];
   disabled: boolean;
   canMoveUp: boolean;
   canMoveDown: boolean;
+  targetIndex: number;
+  isDragOver: boolean;
+  onDragOverRow: (id: string) => void;
+  onDragEndRow: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
   const [savedError, setSavedError] = useState<string | null>(null);
@@ -106,7 +124,39 @@ function LineItemRowEditor({
   }
 
   return (
-    <tr className="border-b border-foreground/5 align-top">
+    <tr
+      className={`border-b border-foreground/5 align-top ${isDragOver ? "bg-foreground/[0.06]" : ""}`}
+      onDragOver={(e) => {
+        if (disabled) return;
+        e.preventDefault();
+        onDragOverRow(item.id);
+      }}
+      onDragLeave={() => onDragEndRow()}
+      onDrop={(e) => {
+        if (disabled) return;
+        e.preventDefault();
+        onDragEndRow();
+        const draggedId = e.dataTransfer.getData("text/plain");
+        if (!draggedId || draggedId === item.id) return;
+        startTransition(async () => {
+          await moveLineItem(estimateId, draggedId, categories, targetIndex);
+        });
+      }}
+    >
+      <td className="py-2 pr-2 text-foreground/30">
+        {!disabled && (
+          <span
+            draggable
+            onDragStart={(e) => e.dataTransfer.setData("text/plain", item.id)}
+            onDragEnd={() => onDragEndRow()}
+            aria-hidden="true"
+            title="Drag to reorder"
+            className="inline-block cursor-grab select-none px-1 active:cursor-grabbing"
+          >
+            ⠿
+          </span>
+        )}
+      </td>
       <td className="py-2 pr-2 text-foreground/70">{CATEGORY_LABELS[item.category]}</td>
       <td className="py-2 pr-2">
         <input
@@ -185,7 +235,7 @@ function LineItemRowEditor({
               type="button"
               aria-label="Move up"
               disabled={!canMoveUp}
-              onClick={() => startTransition(async () => { await reorderLineItem(estimateId, item.id, "up"); })}
+              onClick={() => startTransition(async () => { await reorderLineItem(estimateId, item.id, "up", categories); })}
               className="disabled:opacity-30"
             >
               ↑
@@ -194,7 +244,7 @@ function LineItemRowEditor({
               type="button"
               aria-label="Move down"
               disabled={!canMoveDown}
-              onClick={() => startTransition(async () => { await reorderLineItem(estimateId, item.id, "down"); })}
+              onClick={() => startTransition(async () => { await reorderLineItem(estimateId, item.id, "down", categories); })}
               className="disabled:opacity-30"
             >
               ↓

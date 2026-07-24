@@ -124,17 +124,18 @@ npm test          # run once
 npm run test:watch
 ```
 
-127 tests across: the calculation engine, the DB-row mapping layer, CSV
+135 tests across: the calculation engine, the DB-row mapping layer, CSV
 injection-safety (export and import), PDF generation (real PDF bytes, real
 assertion that internal cost/margin never appears in the customer
 proposal's bytes), role-gating (`assertRole` and every role constant
 list), the suggestions rules engine, the audit-log summary formatter, the
 version-diff matching logic, invite-validity rules (expiry/revocation/
-email-matching), and component-level empty/failure-state rendering
-(React Testing Library + jsdom — `SuggestionsPanel`,
-`GuestCountHistory`, `LineItemsSection`, `StatusActions`; server actions
-imported by client components are mocked via `vi.mock` rather than
-exercised for real, since they need a live Supabase session). See Known
+email-matching), and component-level empty/failure-state and drag-and-
+drop rendering (React Testing Library + jsdom — `SuggestionsPanel`,
+`GuestCountHistory`, `LineItemsSection`, `StatusActions`, `PipelineBoard`;
+server actions imported by client components are mocked via `vi.mock`
+rather than exercised for real, since they need a live Supabase session).
+See Known
 Limitations in the completion report for what test coverage *doesn't*
 exist yet (integration/workflow tests, end-to-end/browser-level
 permission enforcement, responsive UI tests) — those need a real browser

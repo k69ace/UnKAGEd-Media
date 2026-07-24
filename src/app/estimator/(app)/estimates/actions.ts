@@ -517,10 +517,19 @@ export async function deleteLineItem(estimateId: string, lineItemId: string): Pr
   }
 }
 
+// Both reorder actions take `categories` and scope every query to it,
+// matching exactly what a single LineItemsSection renders (a section can
+// span more than one category, e.g. "Menu/Packages" = menu_item + package).
+// sort_order is one global counter across the whole estimate, not
+// per-category, so without this scoping an "up" click here could compute
+// its swap partner against a globally-adjacent item from a *different*
+// section -- moving the wrong row, or silently doing nothing visible in
+// the section the user is looking at.
 export async function reorderLineItem(
   estimateId: string,
   lineItemId: string,
   direction: "up" | "down",
+  categories: LineItemCategory[],
 ): Promise<{ error?: string }> {
   try {
     const profile = await requireProfile();
@@ -531,6 +540,7 @@ export async function reorderLineItem(
       .from("catering_estimate_line_items")
       .select("id, sort_order")
       .eq("estimate_id", estimateId)
+      .in("category", categories)
       .order("sort_order");
     if (error) throw error;
 
@@ -544,6 +554,58 @@ export async function reorderLineItem(
       supabase.from("catering_estimate_line_items").update({ sort_order: b.sort_order }).eq("id", a.id),
       supabase.from("catering_estimate_line_items").update({ sort_order: a.sort_order }).eq("id", b.id),
     ]);
+
+    revalidateEstimate(estimateId);
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Failed to reorder." };
+  }
+}
+
+/**
+ * Drag-and-drop reordering: moves a line item to an arbitrary position
+ * within its section instead of one step. Reassigns the *existing*
+ * sort_order values within the categories-scoped subset onto the
+ * reordered id list (a permutation of values already in use by this
+ * subset) rather than inventing new numbers, so it can never collide with
+ * an item outside `categories`.
+ */
+export async function moveLineItem(
+  estimateId: string,
+  lineItemId: string,
+  categories: LineItemCategory[],
+  newIndex: number,
+): Promise<{ error?: string }> {
+  try {
+    const profile = await requireProfile();
+    assertRole(profile, ESTIMATE_WRITE_ROLES);
+    const supabase = await createClient();
+
+    const { data: items, error } = await supabase
+      .from("catering_estimate_line_items")
+      .select("id, sort_order")
+      .eq("estimate_id", estimateId)
+      .in("category", categories)
+      .order("sort_order");
+    if (error) throw error;
+
+    const fromIndex = items.findIndex((i) => i.id === lineItemId);
+    if (fromIndex < 0) return {};
+    const clampedIndex = Math.max(0, Math.min(newIndex, items.length - 1));
+    if (fromIndex === clampedIndex) return {};
+
+    const sortOrders = items.map((i) => i.sort_order);
+    const ids = items.map((i) => i.id);
+    const [movedId] = ids.splice(fromIndex, 1);
+    ids.splice(clampedIndex, 0, movedId);
+
+    for (const [i, id] of ids.entries()) {
+      const { error: rowError } = await supabase
+        .from("catering_estimate_line_items")
+        .update({ sort_order: sortOrders[i] })
+        .eq("id", id);
+      if (rowError) throw rowError;
+    }
 
     revalidateEstimate(estimateId);
     return {};

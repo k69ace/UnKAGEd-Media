@@ -3,9 +3,9 @@ import { requireProfile } from "@/lib/auth/profile";
 import { listAllLocations, listEstimatesForPipeline, listOrgConfig, listOrgMembers, type PipelineFilters } from "@/lib/data/catering";
 import { calculateGrandTotal } from "@/lib/calculations/catering";
 import { toCalcLineItem, toCalcTaxRule, serviceChargeConfigFromSettings, gratuityConfigFromSettings } from "@/lib/calculations/mappers";
-import { PIPELINE_STATUSES, STATUS_LABELS } from "@/lib/constants/catering";
+import { PIPELINE_STATUSES } from "@/lib/constants/catering";
 import { PipelineFiltersBar } from "@/components/estimator/PipelineFiltersBar";
-import { PipelineStatusSelect } from "@/components/estimator/PipelineStatusSelect";
+import { PipelineBoard } from "@/components/estimator/PipelineBoard";
 
 function money(value: number): string {
   return value.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -124,35 +124,7 @@ export default async function PipelinePage({
           .
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-4 overflow-x-auto sm:grid-cols-3 lg:grid-cols-5">
-          {columns.map((col) => (
-            <div key={col.status} className="min-w-[220px]">
-              <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-foreground/50">
-                {STATUS_LABELS[col.status]} ({col.items.length})
-              </h2>
-              <div className="flex flex-col gap-2">
-                {col.items.map((item) => (
-                  <div key={item.id} className="rounded-lg border border-foreground/10 p-3 text-sm">
-                    <Link href={`/estimator/estimates/${item.id}`} className="font-medium hover:underline">
-                      {item.customers?.name ?? "—"}
-                    </Link>
-                    <p className="text-xs text-foreground/50">{item.event_types?.name ?? "No event type"}</p>
-                    <p className="text-xs text-foreground/50">{item.event_date ?? "No date set"}</p>
-                    <p className="mt-1 font-semibold">{money(item.grandTotal)}</p>
-                    <p className="text-xs text-foreground/50">
-                      {item.guest_count_guaranteed ?? item.guest_count_estimated ?? "—"} guests · v{item.version}
-                    </p>
-                    {item.created_by_profile && <p className="text-xs text-foreground/40">{item.created_by_profile.full_name}</p>}
-                    <div className="mt-2">
-                      <PipelineStatusSelect estimateId={item.id} status={item.status} />
-                    </div>
-                  </div>
-                ))}
-                {col.items.length === 0 && <p className="text-xs text-foreground/30">Nothing here.</p>}
-              </div>
-            </div>
-          ))}
-        </div>
+        <PipelineBoard columns={columns} />
       )}
     </div>
   );

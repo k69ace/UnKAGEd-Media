@@ -42,8 +42,8 @@ in the first time — check your inbox for a confirmation link.
   drop in a whole package's line items at once, then adjust quantities/
   prices as needed. Every line item has its own taxable flag and tax rule
   — don't assume "taxable" defaults the way you expect; check it.
-  Reorder rows with the ↑/↓ arrows next to each line (no drag-and-drop
-  yet).
+  Reorder rows by dragging the ⠿ handle on the left, or with the ↑/↓
+  arrows next to each line if you'd rather not drag.
 - **Staffing** — add roles, hours, and rate. You'll get an on-page note if
   you have more than 50 guests and no staffing line yet.
 - **Fees & Discounts** — a dollar discount (can't exceed the subtotal —
@@ -119,8 +119,10 @@ cost, margin, owner, and created date.
 Status columns (Draft → Sent → Approved → Won/Lost), KPI cards (open
 pipeline value, win rate, average deal size, approved events in the next
 7 days), and filters by event type/location/sales owner/date range/guest
-count. Change an estimate's status directly from its card using the
-dropdown — that's the same status logic as the Review & Send buttons on
-the estimate itself, so
-the same validation rules apply (e.g. you still can't mark something
-Approved past the org's threshold unless you have the right role).
+count. Change an estimate's status by dragging its card into a different
+column, or with the dropdown on the card if you'd rather not drag —
+both call the same status logic as the Review & Send buttons on the
+estimate itself, so the same validation rules apply (e.g. you still
+can't mark something Approved past the org's threshold unless you have
+the right role, and a drag that hits a validation error shows the exact
+same message the dropdown would).
