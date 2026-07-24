@@ -154,11 +154,11 @@ select prosrc from pg_proc where proname = 'current_organization_id';
   in the schema fails closed for a deactivated profile. **This migration
   was written but not yet confirmed applied** — see the verification note
   below.
-- **No CRUD UI for package templates.** Event types, service styles, and
-  staffing roles now have one (Settings — add/deactivate, plus rate/ratio
-  for staffing roles); package templates still ship with a seeded example
-  from `supabase/seed.sql` only and are editable via the Supabase Table
-  Editor, not the app.
+- **Package templates now have a Settings UI** too — create a template,
+  add/remove its line items (category, description, qty, price, cost,
+  taxability, tax rule), activate/deactivate. This closes the last of the
+  four config-list gaps (event types, service styles, staffing roles,
+  package templates all now manageable from `/estimator/settings`).
 - **`chef_review_required` is an unenforced database field.** No
   feasibility-review workflow step gates Send or Approve today.
 - **No CSV import for menu/pricing catalogs**, despite being listed under

@@ -1,10 +1,19 @@
 import { requireProfile, ADMIN_ROLES } from "@/lib/auth/profile";
-import { listAllEventTypes, listAllServiceStyles, listAllStaffingRoles, listAllTaxRules, listOrgConfig, listOrgMembers } from "@/lib/data/catering";
+import {
+  listAllEventTypes,
+  listAllPackageTemplates,
+  listAllServiceStyles,
+  listAllStaffingRoles,
+  listAllTaxRules,
+  listOrgConfig,
+  listOrgMembers,
+} from "@/lib/data/catering";
 import { TaxRulesManager } from "@/components/estimator/TaxRulesManager";
 import { ChargeSettingsForm } from "@/components/estimator/ChargeSettingsForm";
 import { NamedListManager } from "@/components/estimator/NamedListManager";
 import { StaffingRolesManager } from "@/components/estimator/StaffingRolesManager";
 import { TeamManager } from "@/components/estimator/TeamManager";
+import { PackageTemplateManager } from "@/components/estimator/PackageTemplateManager";
 import { createEventType, createServiceStyle, toggleEventTypeActive, toggleServiceStyleActive } from "./actions";
 
 export default async function SettingsPage() {
@@ -18,13 +27,14 @@ export default async function SettingsPage() {
     );
   }
 
-  const [config, allTaxRules, allEventTypes, allServiceStyles, allStaffingRoles, members] = await Promise.all([
+  const [config, allTaxRules, allEventTypes, allServiceStyles, allStaffingRoles, members, allPackageTemplates] = await Promise.all([
     listOrgConfig(profile.organizationId),
     listAllTaxRules(profile.organizationId),
     listAllEventTypes(profile.organizationId),
     listAllServiceStyles(profile.organizationId),
     listAllStaffingRoles(profile.organizationId),
     listOrgMembers(profile.organizationId),
+    listAllPackageTemplates(profile.organizationId),
   ]);
 
   return (
@@ -101,14 +111,24 @@ export default async function SettingsPage() {
         </div>
       </section>
 
+      <section>
+        <h2 className="text-base font-semibold">Package Templates</h2>
+        <p className="mt-1 text-sm text-foreground/60">
+          Reusable bundles of line items sales staff can drop onto an estimate in one step (Menu/Packages section
+          of the builder). Editing a template only affects future uses of it — estimates that already applied it
+          keep their own copy of the line items, untouched.
+        </p>
+        <div className="mt-4">
+          <PackageTemplateManager templates={allPackageTemplates} taxRules={config.taxRules} />
+        </div>
+      </section>
+
       <section className="rounded-lg border border-dashed border-foreground/15 p-4 text-sm text-foreground/60">
         <p className="font-medium text-foreground/80">Not yet manageable from this page</p>
         <p className="mt-1">
-          Package templates don&apos;t have a dedicated admin UI yet — edit them directly via the Supabase Table
-          Editor, or adapt the demo template created by <code>supabase/seed.sql</code>. There&apos;s also still no
-          invite flow — a new teammate&apos;s sign-up creates its own separate organization, and merging that
-          into yours requires a direct database edit (see the admin guide); the Team list above only manages
-          role/active status for people already in your organization.
+          There&apos;s still no invite flow — a new teammate&apos;s sign-up creates its own separate organization,
+          and merging that into yours requires a direct database edit (see the admin guide); the Team list above
+          only manages role/active status for people already in your organization.
         </p>
       </section>
     </div>

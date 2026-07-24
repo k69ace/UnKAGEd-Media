@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { assertRole, requireProfile, ADMIN_ROLES } from "@/lib/auth/profile";
-import type { AppRole } from "@/lib/supabase/types";
+import type { AppRole, Database } from "@/lib/supabase/types";
+
+type LineItemCategory = Database["public"]["Enums"]["line_item_category"];
 
 const VALID_ROLES: AppRole[] = ["catering_admin", "manager_owner", "sales_manager", "chef", "reporting_readonly"];
 
@@ -288,4 +290,117 @@ export async function toggleMemberActive(memberId: string, isActive: boolean): P
 
   revalidatePath("/estimator/settings");
   return {};
+}
+
+export async function createPackageTemplate(_prev: SettingsActionState, formData: FormData): Promise<SettingsActionState> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "Name is required." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("catering_package_templates").insert({
+    organization_id: profile.organizationId,
+    name,
+    description: String(formData.get("description") ?? "") || null,
+    base_per_person_price: formData.get("basePerPersonPrice") ? Number(formData.get("basePerPersonPrice")) : null,
+    created_by: profile.id,
+  });
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+export async function togglePackageTemplateActive(id: string, isActive: boolean): Promise<{ error?: string }> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("catering_package_templates")
+    .update({ is_active: isActive })
+    .eq("id", id)
+    .eq("organization_id", profile.organizationId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/estimator/settings");
+  return {};
+}
+
+export interface TemplateLineItemInput {
+  category: LineItemCategory;
+  description: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  unitCost: number | null;
+  isTaxable: boolean;
+  taxRuleId: string | null;
+}
+
+async function assertTemplateOwnedByOrg(templateId: string, organizationId: string): Promise<void> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("catering_package_templates")
+    .select("id")
+    .eq("id", templateId)
+    .eq("organization_id", organizationId)
+    .single();
+  if (!data) throw new Error("Template not found.");
+}
+
+export async function addTemplateLineItem(templateId: string, input: TemplateLineItemInput): Promise<{ error?: string }> {
+  try {
+    const profile = await requireProfile();
+    assertRole(profile, ADMIN_ROLES);
+    await assertTemplateOwnedByOrg(templateId, profile.organizationId);
+
+    const supabase = await createClient();
+    const { count } = await supabase
+      .from("catering_package_template_line_items")
+      .select("id", { count: "exact", head: true })
+      .eq("template_id", templateId);
+
+    const { error } = await supabase.from("catering_package_template_line_items").insert({
+      template_id: templateId,
+      category: input.category,
+      description: input.description,
+      quantity: input.quantity,
+      unit: input.unit,
+      unit_price: input.unitPrice,
+      unit_cost: input.unitCost,
+      is_taxable: input.isTaxable,
+      tax_rule_id: input.taxRuleId,
+      sort_order: count ?? 0,
+    });
+    if (error) throw error;
+
+    revalidatePath("/estimator/settings");
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Failed to add line item." };
+  }
+}
+
+export async function deleteTemplateLineItem(templateId: string, lineItemId: string): Promise<{ error?: string }> {
+  try {
+    const profile = await requireProfile();
+    assertRole(profile, ADMIN_ROLES);
+    await assertTemplateOwnedByOrg(templateId, profile.organizationId);
+
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("catering_package_template_line_items")
+      .delete()
+      .eq("id", lineItemId)
+      .eq("template_id", templateId);
+    if (error) throw error;
+
+    revalidatePath("/estimator/settings");
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Failed to remove line item." };
+  }
 }

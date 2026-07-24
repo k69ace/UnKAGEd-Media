@@ -109,13 +109,17 @@ roles: Server, Bartender, Captain, Chef) that you can add to or deactivate
 from here. There's no rename/delete from this page yet — deactivate and
 add a replacement instead, the same pattern as Tax Rules.
 
-## Not yet manageable from Settings
+## Package Templates
 
-- **Package templates** (`catering_package_templates` +
-  `catering_package_template_line_items`) — none seeded by default; add
-  via SQL, or as a starting point, adapt the demo package template created
-  by `supabase/seed.sql`.
+`/estimator/settings` → **Package Templates** manages these too: create a
+template (name, description, base per-person price), then expand it to
+add or remove its line items (category, description, quantity/unit,
+price, cost, taxable + tax rule — the same fields a line item has on a
+real estimate). None ship seeded by default; `supabase/seed.sql` creates
+one realistic example to start from. Applying a template to an estimate
+**copies** its line items onto that estimate — editing the template
+afterward never retroactively changes an estimate that already used it.
 
-Adding/editing rows in these tables via the dashboard takes effect
-immediately in the estimate builder's dropdowns — no deploy or cache
-clear needed.
+Adding/editing rows via the dashboard (for anything not yet covered by a
+Settings page) takes effect immediately in the estimate builder — no
+deploy or cache clear needed.

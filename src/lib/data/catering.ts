@@ -124,6 +124,17 @@ export async function listAllStaffingRoles(organizationId: string) {
   return data;
 }
 
+export async function listAllPackageTemplates(organizationId: string): Promise<PackageTemplateWithLineItems[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("catering_package_templates")
+    .select("*, catering_package_template_line_items(*)")
+    .eq("organization_id", organizationId)
+    .order("name");
+  if (error) throw error;
+  return data as unknown as PackageTemplateWithLineItems[];
+}
+
 export async function listOrgConfig(organizationId: string) {
   const supabase = await createClient();
   const [taxRules, eventTypes, serviceStyles, staffingRoles, settings, packageTemplates] = await Promise.all([
