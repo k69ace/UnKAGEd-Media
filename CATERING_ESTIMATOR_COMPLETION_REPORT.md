@@ -18,7 +18,7 @@ settings/seed/docs.
   deprecated `middleware.ts` in favor of `proxy.ts`. Migrated accordingly.
   Both the initial skepticism and the later correction are recorded in the
   audit file.
-- **Data model** — 6 migrations (`supabase/migrations/`), applied to a
+- **Data model** — 7 migrations (`supabase/migrations/`), applied to a
   dedicated Supabase project (`unkaged-catering-estimator`): organizations/
   locations/profiles/roles, customers/contacts, tax rules + org settings +
   event types/service styles/staffing roles, package templates, the
@@ -82,7 +82,7 @@ settings/seed/docs.
 ## Verification performed
 
 - `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm test`
-  (67 tests) all clean as of the final commit on this branch.
+  (86 tests) all clean as of the final commit on this branch.
 - Schema/RLS verified live against the Supabase project via SQL Editor
   queries (not just "the migration ran without an error").
 - A real browser smoke test against the dev server (Playwright) caught and
@@ -161,8 +161,16 @@ select prosrc from pg_proc where proname = 'current_organization_id';
   package templates all now manageable from `/estimator/settings`).
 - **`chef_review_required` is an unenforced database field.** No
   feasibility-review workflow step gates Send or Approve today.
-- **No CSV import for menu/pricing catalogs**, despite being listed under
-  MVP integrations scope — export exists, import doesn't.
+- **CSV import now exists** for menu/pricing catalogs (Settings → Package
+  Templates → "Import a template from CSV"): category/description/
+  quantity/unit/price/cost/taxable/tax-rule-name columns, whole-file
+  validation (every row's errors reported together, nothing partially
+  imported on a bad file). `lib/import/csv.ts` (a small dependency-free
+  RFC4180-ish parser) and `lib/import/packageTemplateCsv.ts` (the
+  validation/mapping layer) have 16 tests between them, including the
+  "collects every row's error, not just the first" and
+  "rejects the whole file, no partial import" cases the spec's Testing
+  section calls for explicitly.
 - **Customer proposal PDF is always itemized**, not configurable to a
   package-summary view (spec allowed either, configurable per org).
 - **Guest-count change history** is recorded (every change, by whom, when
@@ -181,7 +189,7 @@ select prosrc from pg_proc where proname = 'current_organization_id';
 - **Test coverage gap vs. the spec's Testing section**: unit tests exist
   for calculations, DB-row mapping, CSV safety, PDF generation, the
   suggestions rules engine, and role-gating (`assertRole`, every role
-  constant list) — 67 tests. Still not built: integration tests for the
+  constant list, and CSV import validation) — 86 tests. Still not built: integration tests for the
   full create→send→approve→won workflow, responsive UI tests,
   empty/failure-state tests, and CSV *import* validation tests (there's no
   import feature to test). These specifically need a real browser against
@@ -210,5 +218,5 @@ select prosrc from pg_proc where proname = 'current_organization_id';
 | Version history preserved for post-approval edits | Done |
 | No internal cost/margin data on a customer-facing export | Done — tested |
 | Role-based access and approval-threshold logic enforced server-side | Done (`assertRole` + RLS) |
-| All calculation tests pass; no floating-point currency bugs | Done — 67/67 passing, epsilon-corrected rounding |
+| All calculation tests pass; no floating-point currency bugs | Done — 86/86 passing, epsilon-corrected rounding |
 | `AUDIT_CATERING.md` and this report committed and accurate | Done |

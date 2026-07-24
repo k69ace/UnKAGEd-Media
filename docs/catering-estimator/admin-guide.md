@@ -120,6 +120,17 @@ one realistic example to start from. Applying a template to an estimate
 **copies** its line items onto that estimate — editing the template
 afterward never retroactively changes an estimate that already used it.
 
+**Importing a catalog from CSV**: same section, "Import a template from
+CSV" — pick a template name and a file with columns `Category,
+Description, Quantity, Unit, Unit Price, Unit Cost, Taxable, Tax Rule`
+(the expandable panel shows a copy-pasteable example). Category accepts
+either the display name ("Menu item") or the raw key ("menu_item"); Tax
+Rule must exactly match an existing active tax rule's name in your
+organization, or be left blank for untaxed. The whole file is validated
+before anything is created — one bad row rejects the entire import and
+lists every row's error, not just the first, so you never end up with a
+half-imported catalog to clean up.
+
 Adding/editing rows via the dashboard (for anything not yet covered by a
 Settings page) takes effect immediately in the estimate builder — no
 deploy or cache clear needed.

@@ -14,6 +14,7 @@ import { NamedListManager } from "@/components/estimator/NamedListManager";
 import { StaffingRolesManager } from "@/components/estimator/StaffingRolesManager";
 import { TeamManager } from "@/components/estimator/TeamManager";
 import { PackageTemplateManager } from "@/components/estimator/PackageTemplateManager";
+import { PackageTemplateCsvImport } from "@/components/estimator/PackageTemplateCsvImport";
 import { createEventType, createServiceStyle, toggleEventTypeActive, toggleServiceStyleActive } from "./actions";
 
 export default async function SettingsPage() {
@@ -118,8 +119,9 @@ export default async function SettingsPage() {
           of the builder). Editing a template only affects future uses of it — estimates that already applied it
           keep their own copy of the line items, untouched.
         </p>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-col gap-4">
           <PackageTemplateManager templates={allPackageTemplates} taxRules={config.taxRules} />
+          <PackageTemplateCsvImport />
         </div>
       </section>
 

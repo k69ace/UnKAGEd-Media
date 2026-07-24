@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { assertRole, requireProfile, ADMIN_ROLES } from "@/lib/auth/profile";
+import { parsePackageTemplateCsv } from "@/lib/import/packageTemplateCsv";
 import type { AppRole, Database } from "@/lib/supabase/types";
 
 type LineItemCategory = Database["public"]["Enums"]["line_item_category"];
@@ -403,4 +404,64 @@ export async function deleteTemplateLineItem(templateId: string, lineItemId: str
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Failed to remove line item." };
   }
+}
+
+export interface ImportPackageTemplateState {
+  error?: string;
+  errors?: string[];
+  success?: boolean;
+}
+
+export async function importPackageTemplateCsv(
+  _prev: ImportPackageTemplateState,
+  formData: FormData,
+): Promise<ImportPackageTemplateState> {
+  const profile = await requireProfile();
+  assertRole(profile, ADMIN_ROLES);
+
+  const templateName = String(formData.get("templateName") ?? "").trim();
+  if (!templateName) return { error: "Template name is required." };
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Choose a CSV file to import." };
+  }
+  const csvText = await file.text();
+
+  const supabase = await createClient();
+  const { data: taxRules } = await supabase
+    .from("tax_rules")
+    .select("id, name")
+    .eq("organization_id", profile.organizationId)
+    .eq("is_active", true);
+
+  const { items, errors } = parsePackageTemplateCsv(csvText, taxRules ?? []);
+  if (errors.length > 0) return { errors };
+  if (items.length === 0) return { error: "No valid rows found in the file." };
+
+  const { data: template, error: templateError } = await supabase
+    .from("catering_package_templates")
+    .insert({ organization_id: profile.organizationId, name: templateName, created_by: profile.id })
+    .select("id")
+    .single();
+  if (templateError) return { error: templateError.message };
+
+  const { error: itemsError } = await supabase.from("catering_package_template_line_items").insert(
+    items.map((item, i) => ({
+      template_id: template.id,
+      category: item.category,
+      description: item.description,
+      quantity: item.quantity,
+      unit: item.unit,
+      unit_price: item.unitPrice,
+      unit_cost: item.unitCost,
+      is_taxable: item.isTaxable,
+      tax_rule_id: item.taxRuleId,
+      sort_order: i,
+    })),
+  );
+  if (itemsError) return { error: itemsError.message };
+
+  revalidatePath("/estimator/settings");
+  return { success: true };
 }

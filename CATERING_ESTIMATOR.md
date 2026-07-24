@@ -66,6 +66,7 @@ src/lib/
   calculations/estimateSummary.ts  Wires a DB estimate through the engine
   suggestions/              Rules-based (+ optional AI) upsell/missing-info engine
   export/csv.ts             Injection-safe CSV builder
+  import/                   CSV parsing + package-template import validation
   pdf/                      Customer + internal PDF documents
   integrations/catering/    Adapter contracts for future CRM/invoicing/lead-capture
                              integrations — no providers wired up (see file header)
@@ -112,7 +113,7 @@ npm test          # run once
 npm run test:watch
 ```
 
-67 tests across: the calculation engine, the DB-row mapping layer, CSV
+86 tests across: the calculation engine, the DB-row mapping layer, CSV
 injection-safety, PDF generation (real PDF bytes, real assertion that
 internal cost/margin never appears in the customer proposal's bytes),
 role-gating (`assertRole` and every role constant list), and the
